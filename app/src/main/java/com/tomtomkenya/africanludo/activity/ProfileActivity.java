@@ -191,7 +191,7 @@ public class ProfileActivity extends AppCompatActivity implements PicModeSelectD
 
                     mUserDatabase.updateChildren(updateHashMap).addOnCompleteListener((OnCompleteListener<Void>) Task::isSuccessful);
 
-                    Call<UserModel> callInfo = api.updateUserProfileInfo(AppConstant.PURCHASE_KEY, Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), strName, stWhatsApp);
+                    Call<UserModel> callInfo = api.updateUserProfileInfo(Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), strName, stWhatsApp);
                     callInfo.enqueue(new Callback<UserModel>() {
                         @Override
                         public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -223,7 +223,7 @@ public class ProfileActivity extends AppCompatActivity implements PicModeSelectD
                 if (!Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_PASSWORD).equals(strPassword)) {
                     progressBar.showProgressDialog();
 
-                    Call<UserModel> callPass = api.updateUserProfilePassword(AppConstant.PURCHASE_KEY, Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), strPassword);
+                    Call<UserModel> callPass = api.updateUserProfilePassword(Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), strPassword);
                     callPass.enqueue(new Callback<UserModel>() {
                         @Override
                         public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -395,7 +395,7 @@ public class ProfileActivity extends AppCompatActivity implements PicModeSelectD
 
         mUserDatabase.updateChildren(updateHashMap).addOnCompleteListener((OnCompleteListener<Void>) Task::isSuccessful);
 
-        Call<UserModel> call = api.updateUserPicture(AppConstant.PURCHASE_KEY, Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), uriFile);
+        Call<UserModel> call = api.updateUserPicture(Preferences.getInstance(ProfileActivity.this).getString(Preferences.KEY_USER_ID), uriFile);
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

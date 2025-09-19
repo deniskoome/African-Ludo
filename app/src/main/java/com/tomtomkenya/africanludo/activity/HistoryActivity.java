@@ -60,7 +60,7 @@ public class HistoryActivity extends AppCompatActivity {
         noDataTv = findViewById(R.id.noDataTv);
         progressBar.showProgressDialog();
 
-        Call<List<HistoryModel>> call = api.getHistory(AppConstant.PURCHASE_KEY, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
+        Call<List<HistoryModel>> call = api.getHistory(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<HistoryModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override

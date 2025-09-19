@@ -113,7 +113,7 @@ public class UpcomingFragment extends Fragment {
     private void getMatchUpcoming() {
         progressBar.showProgressDialog();
 
-        Call<List<MatchModel>> call = api.getMatchUpcoming(AppConstant.PURCHASE_KEY, Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+        Call<List<MatchModel>> call = api.getMatchUpcoming(Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<MatchModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -216,7 +216,7 @@ public class UpcomingFragment extends Fragment {
     }
 
     private void getUserDetails() {
-        Call<UserModel> call = api.getUserDetails(AppConstant.PURCHASE_KEY, Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+        Call<UserModel> call = api.getUserDetails(Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -293,7 +293,7 @@ public class UpcomingFragment extends Fragment {
         if (obj.getTable_joined() == 0) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.postParticipant1Result(AppConstant.PURCHASE_KEY, obj.getId(), Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+            Call<MatchModel> call = api.postParticipant1Result(obj.getId(), Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
             call.enqueue(new Callback<MatchModel>() {
                 @Override
                 public void onResponse(@NonNull Call<MatchModel> call, @NonNull Response<MatchModel> response) {
@@ -337,7 +337,7 @@ public class UpcomingFragment extends Fragment {
         else if (obj.getTable_joined() == 1) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.postParticipant2Result(AppConstant.PURCHASE_KEY, obj.getId(), Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+            Call<MatchModel> call = api.postParticipant2Result(obj.getId(), Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
             call.enqueue(new Callback<MatchModel>() {
                 @Override
                 public void onResponse(@NonNull Call<MatchModel> call, @NonNull Response<MatchModel> response) {

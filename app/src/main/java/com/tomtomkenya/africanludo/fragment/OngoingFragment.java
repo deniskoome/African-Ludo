@@ -80,7 +80,7 @@ public class OngoingFragment extends Fragment {
     private void getMatchOngoing() {
         progressBar.showProgressDialog();
 
-        Call<List<MatchModel>> call = api.getMatchOngoing(AppConstant.PURCHASE_KEY, Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+        Call<List<MatchModel>> call = api.getMatchOngoing(Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<MatchModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override

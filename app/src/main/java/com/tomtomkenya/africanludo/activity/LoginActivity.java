@@ -206,6 +206,9 @@ public class LoginActivity extends AppCompatActivity {
                             Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_COUNTRY_CODE, res.getCountry_code());
                             Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_MOBILE, res.getMobile());
                             Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_WHATSAPP, res.getWhatsapp_no());
+                            Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_DEPOSIT_BAL, String.valueOf(res.getDeposit_bal()));
+                            Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_BONUS_BAL, String.valueOf(res.getBonus_bal()));
+                            Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_WON_BAL, String.valueOf(res.getWon_bal()));
                             Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_PASSWORD, strPassword);
                             Preferences.getInstance(LoginActivity.this).setString(Preferences.KEY_IS_AUTO_LOGIN, "1");
 

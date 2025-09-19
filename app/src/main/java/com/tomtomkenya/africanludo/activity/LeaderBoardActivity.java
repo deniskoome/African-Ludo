@@ -60,7 +60,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
         noDataTv = findViewById(R.id.noDataTv);
         progressBar.showProgressDialog();
 
-        Call<List<LeaderboardModel>> call = api.getLeaderboard(AppConstant.PURCHASE_KEY);
+        Call<List<LeaderboardModel>> call = api.getLeaderboard();
         call.enqueue(new Callback<List<LeaderboardModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override

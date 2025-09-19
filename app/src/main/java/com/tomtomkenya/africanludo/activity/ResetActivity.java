@@ -96,7 +96,7 @@ public class ResetActivity extends AppCompatActivity {
     private void userResetPassword() {
         progressBar.showProgressDialog();
 
-        Call<UserModel> call = api.userResetPassword(AppConstant.PURCHASE_KEY, Preferences.getInstance(ResetActivity.this).getString(Preferences.KEY_MOBILE), strConfirmPassword);
+        Call<UserModel> call = api.userResetPassword(Preferences.getInstance(ResetActivity.this).getString(Preferences.KEY_MOBILE), strConfirmPassword);
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

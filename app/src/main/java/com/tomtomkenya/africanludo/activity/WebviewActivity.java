@@ -101,7 +101,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void getFAQ() {
         progressBar.showProgressDialog();
 
-        Call<ConfigurationModel> call = api.getFAQ(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getFAQ();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {
@@ -131,7 +131,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void getPrivacyPolicy() {
         progressBar.showProgressDialog();
 
-        Call<ConfigurationModel> call = api.getPrivacyPolicy(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getPrivacyPolicy();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {
@@ -161,7 +161,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void getLegalPolicy() {
         progressBar.showProgressDialog();
 
-        Call<ConfigurationModel> call = api.getLegalPolicy(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getLegalPolicy();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {
@@ -191,7 +191,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void getAboutUs() {
         progressBar.showProgressDialog();
 
-        Call<ConfigurationModel> call = api.getAboutUs(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getAboutUs();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {
@@ -221,7 +221,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void getTermsCondition() {
         progressBar.showProgressDialog();
 
-        Call<ConfigurationModel> call = api.getTermsCondition(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getTermsCondition();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {

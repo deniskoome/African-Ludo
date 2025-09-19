@@ -269,7 +269,7 @@ public class OTPActivity extends AppCompatActivity {
                 //Got FirebaseMessagingToken
                 tokenSt = Objects.requireNonNull ( task.getResult () );
                 //Use firebaseMessagingToken further
-                Call<UserModel> call = api.customerRegistrationWithRefer(AppConstant.PURCHASE_KEY, Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt, Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_REFER_CODE));
+                Call<UserModel> call = api.customerRegistrationWithRefer(Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt, Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_REFER_CODE));
                 call.enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -322,7 +322,7 @@ public class OTPActivity extends AppCompatActivity {
                 //Got FirebaseMessagingToken
                 tokenSt = Objects.requireNonNull ( task.getResult () );
                 //Use firebaseMessagingToken further
-                Call<UserModel> call = api.customerRegistrationWithoutRefer(AppConstant.PURCHASE_KEY, Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt);
+                Call<UserModel> call = api.customerRegistrationWithoutRefer(Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt);
                 call.enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

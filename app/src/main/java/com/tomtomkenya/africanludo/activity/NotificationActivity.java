@@ -60,7 +60,7 @@ public class NotificationActivity extends AppCompatActivity {
         noDataTv = findViewById(R.id.noDataTv);
         progressBar.showProgressDialog();
 
-        Call<List<NotificationModel>> call = api.getNotification(AppConstant.PURCHASE_KEY, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
+        Call<List<NotificationModel>> call = api.getNotification(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<NotificationModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override

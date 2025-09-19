@@ -84,7 +84,7 @@ public class ForgotActivity extends AppCompatActivity {
 
     private void verifyUserMobile() {
         progressBar.showProgressDialog();
-        Call<UserModel> call = api.verifyUserMobile(AppConstant.PURCHASE_KEY, strMobile);
+        Call<UserModel> call = api.verifyUserMobile(strMobile);
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

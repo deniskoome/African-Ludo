@@ -276,7 +276,7 @@ public class MatchDetailActivity extends AppCompatActivity {
 
     private void searchParticipant() {
         if(run) {
-            Call<List<MatchModel>> call = api.searchParticipant(AppConstant.PURCHASE_KEY, matchIdSt);
+            Call<List<MatchModel>> call = api.searchParticipant(matchIdSt);
             call.enqueue(new Callback<List<MatchModel>>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -340,7 +340,7 @@ public class MatchDetailActivity extends AppCompatActivity {
     private void deleteParticipant() {
         progressBar.showProgressDialog();
 
-        Call<MatchModel> call = api.deleteParticipant(AppConstant.PURCHASE_KEY, matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
+        Call<MatchModel> call = api.deleteParticipant(matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<MatchModel>() {
             @Override
             public void onResponse(@NonNull Call<MatchModel> call, @NonNull Response<MatchModel> response) {
@@ -368,7 +368,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         if (Preferences.getInstance(this).getString(Preferences.KEY_USER_ID).equals(fParticipantIdSt) && status == 2) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.updateResultParti1WithoutProof(AppConstant.PURCHASE_KEY, matchIdSt, String.valueOf(status));
+            Call<MatchModel> call = api.updateResultParti1WithoutProof(matchIdSt, String.valueOf(status));
             call.enqueue(new Callback<MatchModel>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -409,7 +409,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         else if (Preferences.getInstance(this).getString(Preferences.KEY_USER_ID).equals(fParticipantIdSt) && !uriFile.equals("")) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.updateResultParti1WithProof(AppConstant.PURCHASE_KEY, matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), String.valueOf(status), uriFile);
+            Call<MatchModel> call = api.updateResultParti1WithProof(matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), String.valueOf(status), uriFile);
             call.enqueue(new Callback<MatchModel>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -446,7 +446,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         else if (Preferences.getInstance(this).getString(Preferences.KEY_USER_ID).equals(sParticipantIdSt) && status == 2) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.updateResultParti2WithoutProof(AppConstant.PURCHASE_KEY, matchIdSt, String.valueOf(status));
+            Call<MatchModel> call = api.updateResultParti2WithoutProof(matchIdSt, String.valueOf(status));
             call.enqueue(new Callback<MatchModel>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -486,7 +486,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         else if (Preferences.getInstance(this).getString(Preferences.KEY_USER_ID).equals(sParticipantIdSt) && !uriFile.equals("")) {
             progressBar.showProgressDialog();
 
-            Call<MatchModel> call = api.updateResultParti2WithProof(AppConstant.PURCHASE_KEY, matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), String.valueOf(status), uriFile);
+            Call<MatchModel> call = api.updateResultParti2WithProof(matchIdSt, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), String.valueOf(status), uriFile);
             call.enqueue(new Callback<MatchModel>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -526,7 +526,7 @@ public class MatchDetailActivity extends AppCompatActivity {
         rulesWv = findViewById(R.id.rulesWv);
         rulesWv.setBackgroundColor(0);
 
-        Call<ConfigurationModel> call = api.getRules(AppConstant.PURCHASE_KEY);
+        Call<ConfigurationModel> call = api.getRules();
         call.enqueue(new Callback<ConfigurationModel>() {
             @Override
             public void onResponse(@NonNull Call<ConfigurationModel> call, @NonNull Response<ConfigurationModel> response) {

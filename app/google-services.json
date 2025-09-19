@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "777940790938",
+    "firebase_url": "https://african-ludo-default-rtdb.firebaseio.com",
     "project_id": "african-ludo",
     "storage_bucket": "african-ludo.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.tomtomkenya.africanludo"
         }
       },
-      "oauth_client": ["777940790938-h9u8r0otjb6n97olfi29oiv212rvsko9.apps.googleusercontent.com"],
+      "oauth_client": [
+        {
+          "client_id": "777940790938-h9u8r0otjb6n97olfi29oiv212rvsko9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tomtomkenya.africanludo",
+            "certificate_hash": "38774aa1882d7bf1eadd8619be9a0b6bf3a3c12a"
+          }
+        },
+        {
+          "client_id": "777940790938-gapvknhp0ppv9skr1u1o7in15b5fee1b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCfQNv7RZkTverP2ddWl55lTHG3JzBFDeU"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777940790938-gapvknhp0ppv9skr1u1o7in15b5fee1b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -45,6 +45,12 @@ public class Preferences {
     // The constant KEY_WHATSAPP
     public static final String KEY_WHATSAPP = "KEY_WHATSAPP";
 
+    public static final String KEY_DEPOSIT_BAL = "deposit_bal";
+
+    public static final String KEY_WON_BAL = "won_bal";
+
+    public static final String KEY_BONUS_BAL = "bonus_bal";
+
     // The constant KEY_PASSWORD
     public static final String KEY_PASSWORD = "KEY_PASSWORD";
 

@@ -80,7 +80,7 @@ public class CompletedFragment extends Fragment {
     private void getMatchCompleted() {
         progressBar.showProgressDialog();
 
-        Call<List<MatchModel>> call = api.getMatchCompleted(AppConstant.PURCHASE_KEY, Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+        Call<List<MatchModel>> call = api.getMatchCompleted(Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<MatchModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override

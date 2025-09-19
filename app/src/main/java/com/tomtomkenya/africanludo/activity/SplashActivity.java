@@ -91,7 +91,7 @@ public class SplashActivity extends AppCompatActivity {
                     // Get new FCM registration token
                     String token = task.getResult();
 
-                    Call<UserModel> callToken = api.updateUserProfileToken(AppConstant.PURCHASE_KEY, Preferences.getInstance(SplashActivity.this).getString(Preferences.KEY_USER_ID), token);
+                    Call<UserModel> callToken = api.updateUserProfileToken(Preferences.getInstance(SplashActivity.this).getString(Preferences.KEY_USER_ID), token);
                     callToken.enqueue(new Callback<UserModel>() {
                         @Override
                         public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -109,7 +109,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void getAppDetails() {
-        Call<AppModel> call = api.getAppDetails(AppConstant.PURCHASE_KEY);
+        Call<AppModel> call = api.getAppDetails();
         call.enqueue(new Callback<AppModel>() {
             @SuppressLint("SetTextI18n")
             @Override

@@ -167,13 +167,9 @@ public class SettingFragment extends Fragment {
 
         view.findViewById(R.id.logoutBt).setOnClickListener(v -> {
             AlertDialog alertDialog = new AlertDialog.Builder(requireActivity())
-                    // set dialog icon
                     .setIcon(R.drawable.ic_logout)
-                    // Set Dialog Title
                     .setTitle("LOGOUT ACCOUNT")
-                    // Set Dialog Message
                     .setMessage("Are you sure you want to logout?")
-                    // positive button
                     .setPositiveButton("Confirm", (dialog, which) -> {
                         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireActivity());
                         if (googleSignInClient != null && account != null) {
@@ -187,9 +183,8 @@ public class SettingFragment extends Fragment {
                             Preferences.getInstance(getActivity()).setlogout();
                         }
                     })
-                    // negative button
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                    }).create();
+                    .setNegativeButton("Cancel", (dialog, which) -> { })
+                    .create();
 
             alertDialog.show();
         });
@@ -220,6 +215,28 @@ public class SettingFragment extends Fragment {
             }
         }
 
+        // ✅ Load balances from SharedPreferences immediately
+        Preferences prefs = Preferences.getInstance(getActivity());
+        String depositStr = prefs.getString(Preferences.KEY_DEPOSIT_BAL);
+        String wonStr = prefs.getString(Preferences.KEY_WON_BAL);
+        String bonusStr = prefs.getString(Preferences.KEY_BONUS_BAL);
+
+        double depositPref = 0, wonPref = 0, bonusPref = 0;
+        try {
+            depositPref = Double.parseDouble(depositStr);
+            wonPref = Double.parseDouble(wonStr);
+            bonusPref = Double.parseDouble(bonusStr);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        double totalPref = depositPref + wonPref + bonusPref;
+
+        depositTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, depositPref));
+        withdrawTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, wonPref));
+        bonusTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, bonusPref));
+        balanceTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, totalPref));
+
+        // Then update from API if online
         if(Function.checkNetworkConnection(requireActivity())) {
             getUserDetails();
         }
@@ -228,7 +245,7 @@ public class SettingFragment extends Fragment {
     }
 
     private void getUserDetails() {
-        Call<UserModel> call = api.getUserDetails(AppConstant.PURCHASE_KEY, Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
+        Call<UserModel> call = api.getUserDetails(Preferences.getInstance(getActivity()).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -237,7 +254,7 @@ public class SettingFragment extends Fragment {
                     List<UserModel.Result> res;
                     if (legalData != null) {
                         res = legalData.getResult();
-                        if (res.get(0).getSuccess() == "1") {
+                        if ("1".equals(res.get(0).getSuccess())) {
                             deposit = res.get(0).getDeposit_bal();
                             winning = res.get(0).getWon_bal();
                             bonus = res.get(0).getBonus_bal();
@@ -248,17 +265,14 @@ public class SettingFragment extends Fragment {
                             bonusTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, bonus));
                             balanceTv.setText(String.format("%s%s", AppConstant.CURRENCY_SIGN, total));
 
-                            if (res.get(0).getIs_block() == 1) {
-                                Preferences.getInstance(getActivity()).setString(Preferences.KEY_IS_AUTO_LOGIN,"0");
+                            // ✅ Save updated values back to SharedPreferences
+                            Preferences prefs = Preferences.getInstance(getActivity());
+                            prefs.setString(Preferences.KEY_DEPOSIT_BAL, String.valueOf(deposit));
+                            prefs.setString(Preferences.KEY_WON_BAL, String.valueOf(winning));
+                            prefs.setString(Preferences.KEY_BONUS_BAL, String.valueOf(bonus));
 
-                                Intent i = new Intent(getActivity(), LoginActivity.class);
-                                i.putExtra("finish", true);
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
-                            }
-                            else if (res.get(0).getIs_active() == 0) {
+                            if (res.get(0).getIs_block() == 1 || res.get(0).getIs_active() == 0) {
                                 Preferences.getInstance(getActivity()).setString(Preferences.KEY_IS_AUTO_LOGIN,"0");
-
                                 Intent i = new Intent(getActivity(), LoginActivity.class);
                                 i.putExtra("finish", true);
                                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -284,7 +298,6 @@ public class SettingFragment extends Fragment {
 
     private void disconnectFromGoogle() {
         googleSignInClient.signOut();
-
         mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
         Preferences.getInstance(getActivity()).setlogout();
     }

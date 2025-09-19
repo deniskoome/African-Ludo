@@ -280,7 +280,7 @@ public class RegisterActivity extends AppCompatActivity {
             strReferral = etCouponSocial.getText().toString().trim();
 
             if (!strReferral.isEmpty()) {
-                Call<UserModel> call = api.verifyUserRefer(AppConstant.PURCHASE_KEY, strReferral);
+                Call<UserModel> call = api.verifyUserRefer(strReferral);
                 call.enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -372,7 +372,7 @@ public class RegisterActivity extends AppCompatActivity {
             if (!strCountryCode.isEmpty() && !strMobile.isEmpty()) {
                 progressBar.showProgressDialog();
 
-                Call<UserModel> call = api.verifyUserRegister(AppConstant.PURCHASE_KEY, strDeviceId, strMobile, strEmail, strUsername);
+                Call<UserModel> call = api.verifyUserRegister(strDeviceId, strMobile, strEmail, strUsername);
                 call.enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

@@ -168,7 +168,7 @@ public class OfflinePayActivity extends AppCompatActivity {
     }
 
     private void getUserDetails() {
-        Call<UserModel> call = api.getUserDetails(AppConstant.PURCHASE_KEY, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
+        Call<UserModel> call = api.getUserDetails(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
@@ -214,7 +214,7 @@ public class OfflinePayActivity extends AppCompatActivity {
     private void postRequestDeposit() {
         checksumSt = "123";
         progressBar.showProgressDialog();
-        Call<UserModel> call = api.postBalance(AppConstant.PURCHASE_KEY, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), orderIdSt, paymentIdSt, checksumSt, Double.parseDouble(amountSt), mopSt );
+        Call<UserModel> call = api.postBalance(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID), orderIdSt, paymentIdSt, checksumSt, Double.parseDouble(amountSt), mopSt );
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

@@ -59,7 +59,7 @@ public class StatisticsActivity extends AppCompatActivity {
         noDataTv = findViewById(R.id.noDataTv);
         progressBar.showProgressDialog();
 
-        Call<List<StatisticsModel>> call = api.getStatistics(AppConstant.PURCHASE_KEY, Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
+        Call<List<StatisticsModel>> call = api.getStatistics(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<List<StatisticsModel>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
