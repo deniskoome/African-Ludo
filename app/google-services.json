@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "777940790938",
+    "project_id": "african-ludo",
+    "storage_bucket": "african-ludo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777940790938:android:8faf3f794acb6ec9837923",
+        "android_client_info": {
+          "package_name": "com.tomtomkenya.africanludo"
+        }
+      },
+      "oauth_client": ["777940790938-h9u8r0otjb6n97olfi29oiv212rvsko9.apps.googleusercontent.com"],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfQNv7RZkTverP2ddWl55lTHG3JzBFDeU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

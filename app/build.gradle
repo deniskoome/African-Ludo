@@ -1,0 +1,115 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+}
+android {
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.tomtomkenya.africanludo"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig getSigningConfig()
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    def appName = "African-Ludo"
+                    if (outputFileName != null && outputFileName.endsWith('.apk')) {
+                        outputFileName = appName + "-V" + defaultConfig.versionName + ".apk"
+                    }
+                }
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+    namespace 'com.tomtomkenya.africanludo'
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    // Android Support Library ---------------------------------------------------------------------
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation 'androidx.browser:browser:1.8.0'
+    implementation "androidx.multidex:multidex:2.0.1"
+
+    // Google Design Library -----------------------------------------------------------------------
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+
+    // Firebase Library ----------------------------------------------------------------------------
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'com.google.firebase:firebase-auth'
+//    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-database:21.0.0'
+    implementation 'com.google.firebase:firebase-storage:21.0.0'
+    implementation 'com.google.firebase:firebase-messaging:24.0.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.0'
+    implementation 'com.google.firebase:firebase-dynamic-links:22.1.0'
+    implementation 'com.google.firebase:firebase-crashlytics:19.0.1'
+    implementation 'com.google.firebase:firebase-analytics:22.0.1'
+
+    // Facebook SDK Library ------------------------------------------------------------------------
+    implementation 'com.facebook.android:facebook-login:17.0.0'
+
+    // Retrofit API Library ------------------------------------------------------------------------
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.11.0'
+
+    // Retrofit API Interceptor for Debuging
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+    // PayTm All-In-One SDK
+    implementation 'com.paytm.appinvokesdk:appinvokesdk:1.6.17'
+
+//    // PayUMoney SDK
+//    implementation 'com.payumoney.sdkui:plug-n-play:1.6.1'
+
+    // RazorPay Payment Library
+    implementation 'com.razorpay:checkout:1.6.39'
+
+    // Third Party Library -------------------------------------------------------------------------
+    implementation 'com.github.bumptech.glide:glide:4.16.0'             // image loader
+    implementation 'com.hbb20:ccp:2.7.3'                                // country code picker
+    implementation 'com.mikhaellopez:circularimageview:4.3.1'           // circle image view
+
+    implementation(name: 'loading-button-android-1.14.0', ext: 'aar')   // animated button for login
+
+    implementation 'com.github.GoodieBag:Pinview:v1.4'                  // otp input text
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+}
+repositories {
+    google()
+    mavenCentral()
+    flatDir { dirs 'libs' }   // 👈 must be here (app level)
+}
