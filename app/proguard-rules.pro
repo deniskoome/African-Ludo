@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Safaricom M-Pesa SDK
+-keep class com.safaricom.mpesa.** { *; }
+-dontwarn com.safaricom.mpesa.**
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+# Mastercard Payment Gateway SDK
+-keep class com.mastercard.gateway.** { *; }
+-keep class com.mastercard.api.** { *; }
+-dontwarn com.mastercard.gateway.**
+-dontwarn com.mastercard.api.**
+-dontwarn org.slf4j.**
