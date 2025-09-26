@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.tomtomkenya.africanludo.BuildConfig;
 import com.tomtomkenya.africanludo.MyApplication;
 import com.tomtomkenya.africanludo.R;
 import com.tomtomkenya.africanludo.api.ApiCalling;
@@ -44,7 +45,7 @@ public class WithdrawActivity extends AppCompatActivity {
     private String nameSt;
     private String numberSt;
     private String amountSt;
-    private String mopSt;
+    private String mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "GooglePay";
     public double deposit = 0, winning = 0, bonus = 0, total = 0;
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
@@ -80,11 +81,20 @@ public class WithdrawActivity extends AppCompatActivity {
         signTv.setText(AppConstant.CURRENCY_SIGN);
         alertTv.setText(String.format("Minimum Redeem Amount is %s%d", AppConstant.CURRENCY_SIGN, AppConstant.MIN_WITHDRAW_LIMIT));
 
-        payTmRb.setOnClickListener(v -> {
-            nameEt.setHint("Enter Account Holder Name");
-            numberEt.setHint("Enter PayTm Number");
-            mopSt = "PayTm";
-        });
+        if (BuildConfig.ENABLE_PAYTM_SDK) {
+            payTmRb.setOnClickListener(v -> {
+                nameEt.setHint("Enter Account Holder Name");
+                numberEt.setHint("Enter PayTm Number");
+                mopSt = "PayTm";
+            });
+        } else {
+            payTmRb.setVisibility(View.GONE);
+        }
+
+        if (!BuildConfig.ENABLE_PAYTM_SDK) {
+            googlePayRb.setChecked(true);
+            mopSt = "GooglePay";
+        }
 
         googlePayRb.setOnClickListener(v -> {
             nameEt.setHint("Enter Account Holder Name");
@@ -107,7 +117,7 @@ public class WithdrawActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            if (payTmRb.isChecked()) {
+            if (BuildConfig.ENABLE_PAYTM_SDK && payTmRb.isChecked()) {
                 mopSt = "PayTm";
                 alertTv.setText("Enter Valid PayTm Number");
             } else if (googlePayRb.isChecked()) {

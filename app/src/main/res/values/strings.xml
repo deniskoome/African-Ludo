@@ -43,5 +43,8 @@
     <string name="order_placed">Balance Added!!!</string>
     <string name="order_error">Error while payment!!!</string>
     <string name="order_cancel">Cancel payment!!!</string>
+ codex/add-payment-methods-in-depositactivity-d2jude
     <string name="payment_configuration_error">Payment configuration is incomplete. Please contact support.</string>
+
+    <string name="paytm_disabled_message">Paytm support is disabled in this build.</string>
 </resources>

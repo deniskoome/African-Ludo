@@ -24,6 +24,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tomtomkenya.africanludo.BuildConfig;
 import com.tomtomkenya.africanludo.MyApplication;
 import com.tomtomkenya.africanludo.R;
 import com.tomtomkenya.africanludo.api.ApiCalling;
@@ -64,7 +65,7 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
     private ApiCalling api;
 
     private String amountSt;
-    private String mopSt = "PayTm";
+    private String mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay";
     public String orderIdSt, paymentIdSt, checksumSt, tokenSt;
 
     private static final String TAG = DepositActivity.class.getSimpleName();
@@ -103,7 +104,11 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         signTv.setText(AppConstant.CURRENCY_SIGN);
         alertTv.setText(String.format("Minimum Add Amount is %s%d", AppConstant.CURRENCY_SIGN, AppConstant.MIN_DEPOSIT_LIMIT));
 
-        payTmRb.setOnClickListener(v -> mopSt = "PayTm");
+        if (BuildConfig.ENABLE_PAYTM_SDK) {
+            payTmRb.setOnClickListener(v -> mopSt = "PayTm");
+        } else {
+            payTmRb.setOnClickListener(v -> Toast.makeText(this, R.string.paytm_disabled_message, Toast.LENGTH_SHORT).show());
+        }
 
         //payuRb.setOnClickListener(v -> mopSt = "PayUMoney");
 
@@ -124,10 +129,10 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         switch (AppConstant.MODE_OF_PAYMENT) {
             case AppConstant.PAYMENT_GATEWAY_PAYTM:
                 radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(View.VISIBLE);
+                payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
                 payuRb.setVisibility(View.GONE);
                 flutterWaveRb.setVisibility(View.GONE);
-                mopSt = "PayTm";
+                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay";
                 break;
             case AppConstant.PAYMENT_GATEWAY_PAYU:
                 radioGroup.setVisibility(View.GONE);
@@ -162,11 +167,13 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                 break;
             default:
                 radioGroup.setVisibility(View.VISIBLE);
-                payTmRb.setVisibility(View.VISIBLE);
+                payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
                 payuRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setVisibility(View.VISIBLE);
+                flutterWaveRb.setVisibility(View.VISIBLE);codex/add-payment-methods-in-depositactivity-d2jude
                 flutterWaveRb.setText(R.string.flutterwave);
                 mopSt = "PayTm";
+=======
+                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay"
                 break;
         }
 
@@ -207,7 +214,12 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                         submitBt.setEnabled(false);
                         switch (mopSt) {
                             case "PayTm":
-                                getPayTmToken();
+                                if (BuildConfig.ENABLE_PAYTM_SDK) {
+                                    getPayTmToken();
+                                } else {
+                                    submitBt.setEnabled(true);
+                                    Toast.makeText(DepositActivity.this, R.string.paytm_disabled_message, Toast.LENGTH_SHORT).show();
+                                }
                                 break;
                             //case "PayUMoney":
                             //    startPayUMoney();

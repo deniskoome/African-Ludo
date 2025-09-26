@@ -3,6 +3,8 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
 }
+def enablePaytmSdk = project.hasProperty('enablePaytmSdk') ? project.property('enablePaytmSdk').toBoolean() : true
+
 android {
     compileSdk 34
     defaultConfig {
@@ -14,6 +16,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
+
+        buildConfigField "boolean", "ENABLE_PAYTM_SDK", enablePaytmSdk.toString()
     }
     buildTypes {
         release {
@@ -85,8 +89,17 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
-    // PayTm All-In-One SDK
-    implementation 'com.paytm.appinvokesdk:appinvokesdk:1.6.17'
+    // Safaricom M-Pesa SDK -------------------------------------------------------
+    implementation 'com.github.safaricom:mpesa-android-sdk:1.0.9'
+
+    // Mastercard Payment Gateway SDK --------------------------------------------
+    implementation 'com.mastercard.gateway:gateway-android:1.7.3'
+    implementation 'com.mastercard.gateway:gateway-android-web:1.7.3'
+
+    // PayTm All-In-One SDK (optional legacy support) ----------------------------
+    if (enablePaytmSdk) {
+        implementation 'com.paytm.appinvokesdk:appinvokesdk:1.6.17'
+    }
 
 //    // PayUMoney SDK
 //    implementation 'com.payumoney.sdkui:plug-n-play:1.6.1'
@@ -111,5 +124,6 @@ dependencies {
 repositories {
     google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     flatDir { dirs 'libs' }   // 👈 must be here (app level)
 }

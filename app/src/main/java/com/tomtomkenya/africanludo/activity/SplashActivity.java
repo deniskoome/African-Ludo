@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Window;
@@ -116,83 +117,97 @@ public class SplashActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<AppModel> call, @NonNull Response<AppModel> response) {
                 if (response.isSuccessful()) {
                     AppModel legalData = response.body();
-                    List<AppModel.Result> res;
                     if (legalData != null) {
-                        res = legalData.getResult();
-                        if (res.get(0).getSuccess() == 1) {
-                            AppConstant.COUNTRY_CODE = res.get(0).getCountry_code();
-                            AppConstant.CURRENCY_CODE = res.get(0).getCurrency_code();
-                            AppConstant.CURRENCY_SIGN = res.get(0).getCurrency_sign();
-                            AppConstant.PAYTM_M_ID = res.get(0).getPaytm_mer_id();
-                            AppConstant.PAYU_M_ID = res.get(0).getPayu_id();
-                            AppConstant.PAYU_M_KEY = res.get(0).getPayu_key();
-                            AppConstant.MIN_JOIN_LIMIT = res.get(0).getMin_entry_fee();
-                            AppConstant.REFERRAL_PERCENTAGE = res.get(0).getRefer_percentage();
-                            AppConstant.MAINTENANCE_MODE = res.get(0).getMaintenance_mode();
-                            AppConstant.MODE_OF_PAYMENT = res.get(0).getMop();
-                            AppConstant.WALLET_MODE = res.get(0).getWallet_mode();
-                            AppConstant.MIN_WITHDRAW_LIMIT = res.get(0).getMin_withdraw();
-                            AppConstant.MAX_WITHDRAW_LIMIT = res.get(0).getMax_withdraw();
-                            AppConstant.MIN_DEPOSIT_LIMIT = res.get(0).getMin_deposit();
-                            AppConstant.MAX_DEPOSIT_LIMIT = res.get(0).getMax_deposit();
-                            AppConstant.GAME_NAME = res.get(0).getGame_name();
-                            AppConstant.PACKAGE_NAME = res.get(0).getPackage_name();
-                            AppConstant.HOW_TO_PLAY = res.get(0).getHow_to_play();
-                            AppConstant.SUPPORT_EMAIL = res.get(0).getCus_support_email();
-                            AppConstant.SUPPORT_MOBILE = res.get(0).getCus_support_mobile();
+                        List<AppModel.Result> res = legalData.getResult();
+                        if (res != null && !res.isEmpty()) {
+                            AppModel.Result result = res.get(0);
+                            if (result.getSuccess() == 1) {
+                                AppConstant.COUNTRY_CODE = result.getCountry_code();
+                                AppConstant.CURRENCY_CODE = result.getCurrency_code();
+                                AppConstant.CURRENCY_SIGN = result.getCurrency_sign();
+                                AppConstant.PAYTM_M_ID = result.getPaytm_mer_id();
+                                AppConstant.PAYU_M_ID = result.getPayu_id();
+                                AppConstant.PAYU_M_KEY = result.getPayu_key();
 
-                            forceUpdate = res.get(0).getForce_update();
-                            whatsNew = res.get(0).getWhats_new();
-                            updateDate = res.get(0).getUpdate_date();
-                            latestVersionName = res.get(0).getLatest_version_name();
-                            latestVersionCode = res.get(0).getLatest_version_code();
-                            updateUrl = res.get(0).getUpdate_url();
+                                String mpesaShortcode = result.getMpesa_shortcode();
+                                String mpesaPasskey = result.getMpesa_passkey();
+                                String mpesaCallbackUrl = result.getMpesa_callback_url();
+                                String mastercardMerchantId = result.getMastercard_merchant_id();
+                                String mastercardMerchantKey = result.getMastercard_merchant_key();
 
-                            try {
-                                if (BuildConfig.VERSION_CODE < Integer.parseInt(latestVersionCode)) {
-                                    if (forceUpdate.equals("1")) {
-                                        Intent intent = new Intent(SplashActivity.this, UpdateAppActivity.class);
-                                        intent.putExtra("forceUpdate", forceUpdate);
-                                        intent.putExtra("whatsNew", whatsNew);
-                                        intent.putExtra("updateDate", updateDate);
-                                        intent.putExtra("latestVersionName", latestVersionName);
-                                        intent.putExtra("updateURL", updateUrl);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                    } else if (forceUpdate.equals("0")) {
-                                        Intent intent = new Intent(SplashActivity.this, UpdateAppActivity.class);
-                                        intent.putExtra("forceUpdate", forceUpdate);
-                                        intent.putExtra("whatsNew", whatsNew);
-                                        intent.putExtra("updateDate", updateDate);
-                                        intent.putExtra("latestVersionName", latestVersionName);
-                                        intent.putExtra("updateURL", updateUrl);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                    }
-                                }
-                                else if (AppConstant.MAINTENANCE_MODE == 0) {
-                                    new Handler().postDelayed(() -> {
-                                        if (Preferences.getInstance(SplashActivity.this).getString(Preferences.KEY_IS_AUTO_LOGIN).equals("1")) {
-                                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                            intent.putExtra("finish", true);
+                                AppConstant.MPESA_SHORTCODE = TextUtils.isEmpty(mpesaShortcode) ? null : mpesaShortcode;
+                                AppConstant.MPESA_PASSKEY = TextUtils.isEmpty(mpesaPasskey) ? null : mpesaPasskey;
+                                AppConstant.MPESA_CALLBACK_URL = TextUtils.isEmpty(mpesaCallbackUrl) ? null : mpesaCallbackUrl;
+                                AppConstant.MASTERCARD_MERCHANT_ID = TextUtils.isEmpty(mastercardMerchantId) ? null : mastercardMerchantId;
+                                AppConstant.MASTERCARD_MERCHANT_KEY = TextUtils.isEmpty(mastercardMerchantKey) ? null : mastercardMerchantKey;
+
+                                AppConstant.MIN_JOIN_LIMIT = result.getMin_entry_fee();
+                                AppConstant.REFERRAL_PERCENTAGE = result.getRefer_percentage();
+                                AppConstant.MAINTENANCE_MODE = result.getMaintenance_mode();
+                                AppConstant.MODE_OF_PAYMENT = result.getMop();
+                                AppConstant.WALLET_MODE = result.getWallet_mode();
+                                AppConstant.MIN_WITHDRAW_LIMIT = result.getMin_withdraw();
+                                AppConstant.MAX_WITHDRAW_LIMIT = result.getMax_withdraw();
+                                AppConstant.MIN_DEPOSIT_LIMIT = result.getMin_deposit();
+                                AppConstant.MAX_DEPOSIT_LIMIT = result.getMax_deposit();
+                                AppConstant.GAME_NAME = result.getGame_name();
+                                AppConstant.PACKAGE_NAME = result.getPackage_name();
+                                AppConstant.HOW_TO_PLAY = result.getHow_to_play();
+                                AppConstant.SUPPORT_EMAIL = result.getCus_support_email();
+                                AppConstant.SUPPORT_MOBILE = result.getCus_support_mobile();
+
+                                forceUpdate = result.getForce_update();
+                                whatsNew = result.getWhats_new();
+                                updateDate = result.getUpdate_date();
+                                latestVersionName = result.getLatest_version_name();
+                                latestVersionCode = result.getLatest_version_code();
+                                updateUrl = result.getUpdate_url();
+
+                                try {
+                                    if (BuildConfig.VERSION_CODE < Integer.parseInt(latestVersionCode)) {
+                                        if (forceUpdate.equals("1")) {
+                                            Intent intent = new Intent(SplashActivity.this, UpdateAppActivity.class);
+                                            intent.putExtra("forceUpdate", forceUpdate);
+                                            intent.putExtra("whatsNew", whatsNew);
+                                            intent.putExtra("updateDate", updateDate);
+                                            intent.putExtra("latestVersionName", latestVersionName);
+                                            intent.putExtra("updateURL", updateUrl);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
-                                        } else {
-                                            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                                            intent.putExtra("finish", true);
+                                        } else if (forceUpdate.equals("0")) {
+                                            Intent intent = new Intent(SplashActivity.this, UpdateAppActivity.class);
+                                            intent.putExtra("forceUpdate", forceUpdate);
+                                            intent.putExtra("whatsNew", whatsNew);
+                                            intent.putExtra("updateDate", updateDate);
+                                            intent.putExtra("latestVersionName", latestVersionName);
+                                            intent.putExtra("updateURL", updateUrl);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
                                         }
-                                        finish();
-                                    },1000);
+                                    }
+                                    else if (AppConstant.MAINTENANCE_MODE == 0) {
+                                        new Handler().postDelayed(() -> {
+                                            if (Preferences.getInstance(SplashActivity.this).getString(Preferences.KEY_IS_AUTO_LOGIN).equals("1")) {
+                                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                                intent.putExtra("finish", true);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(intent);
+                                            } else {
+                                                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                                                intent.putExtra("finish", true);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                startActivity(intent);
+                                            }
+                                            finish();
+                                        },1000);
+                                    }
+                                    else {
+                                        statusTv.setText("App is under maintenance, please try again later.");
+                                    }
                                 }
-                                else {
-                                    statusTv.setText("App is under maintenance, please try again later.");
+                                catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            }
-                            catch (Exception e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
                 }

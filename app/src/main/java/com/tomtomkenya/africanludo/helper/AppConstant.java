@@ -22,18 +22,26 @@ public class AppConstant {
     // Put your PayU production Merchant id & key
     public static String PAYU_M_ID = "XXXXXXXXXXXX";
     public static String PAYU_M_KEY = "XXXXXXXXXXX";
-
+codex/add-payment-methods-in-depositactivity-d2jude
     // Put your Mpesa production credentials
     public static String MPESA_CONSUMER_KEY = null;
     public static String MPESA_CONSUMER_SECRET = null;
     public static String MPESA_PASSKEY = null;
     public static String MPESA_SHORTCODE = null;
+    // Put your Mpesa production shortcode, passkey and callback URL
+    public static String MPESA_SHORTCODE = null;
+    public static String MPESA_PASSKEY = null;
+
     public static String MPESA_CALLBACK_URL = null;
 
     // Put your Mastercard production merchant id & key
     public static String MASTERCARD_MERCHANT_ID = null;
+codex/add-payment-methods-in-depositactivity-d2jude
     public static String MASTERCARD_API_KEY = null;
     public static String MASTERCARD_API_SECRET = null;
+
+    public static String MASTERCARD_MERCHANT_KEY = null;
+
 
     // Set default country code, currency code and sign
     public static String COUNTRY_CODE = "+254";
@@ -48,6 +56,8 @@ public class AppConstant {
     public static final int PAYMENT_GATEWAY_RAZORPAY = 2;
     public static final int PAYMENT_GATEWAY_MPESA = 3;
     public static final int PAYMENT_GATEWAY_MASTERCARD = 4;
+codex/add-payment-methods-in-depositactivity-d2jude
+
     public static int MODE_OF_PAYMENT = PAYMENT_GATEWAY_PAYTM;      // (0 for PayTm, 1 for PayU, 2 for RazorPay, 3 for Mpesa, 4 for Mastercard)
 
     // Set Refer Program
