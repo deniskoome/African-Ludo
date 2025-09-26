@@ -43,6 +43,21 @@ public class AppModel {
         @SerializedName("payu_key")
         private String payu_key;
 
+        @SerializedName("mpesa_shortcode")
+        private String mpesa_shortcode;
+
+        @SerializedName("mpesa_passkey")
+        private String mpesa_passkey;
+
+        @SerializedName("mpesa_callback_url")
+        private String mpesa_callback_url;
+
+        @SerializedName("mastercard_merchant_id")
+        private String mastercard_merchant_id;
+
+        @SerializedName("mastercard_merchant_key")
+        private String mastercard_merchant_key;
+
         @SerializedName("flutter_pub_key")
         private String flutter_pub_key;
 
@@ -181,6 +196,46 @@ public class AppModel {
 
         public void setPayu_key(String payu_key) {
             this.payu_key = payu_key;
+        }
+
+        public String getMpesa_shortcode() {
+            return mpesa_shortcode;
+        }
+
+        public void setMpesa_shortcode(String mpesa_shortcode) {
+            this.mpesa_shortcode = mpesa_shortcode;
+        }
+
+        public String getMpesa_passkey() {
+            return mpesa_passkey;
+        }
+
+        public void setMpesa_passkey(String mpesa_passkey) {
+            this.mpesa_passkey = mpesa_passkey;
+        }
+
+        public String getMpesa_callback_url() {
+            return mpesa_callback_url;
+        }
+
+        public void setMpesa_callback_url(String mpesa_callback_url) {
+            this.mpesa_callback_url = mpesa_callback_url;
+        }
+
+        public String getMastercard_merchant_id() {
+            return mastercard_merchant_id;
+        }
+
+        public void setMastercard_merchant_id(String mastercard_merchant_id) {
+            this.mastercard_merchant_id = mastercard_merchant_id;
+        }
+
+        public String getMastercard_merchant_key() {
+            return mastercard_merchant_key;
+        }
+
+        public void setMastercard_merchant_key(String mastercard_merchant_key) {
+            this.mastercard_merchant_key = mastercard_merchant_key;
         }
 
         public String getFlutter_pub_key() {
