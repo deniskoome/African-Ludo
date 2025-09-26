@@ -23,6 +23,18 @@ public class AppConstant {
     public static String PAYU_M_ID = "XXXXXXXXXXXX";
     public static String PAYU_M_KEY = "XXXXXXXXXXX";
 
+    // Put your Mpesa production credentials
+    public static String MPESA_CONSUMER_KEY = null;
+    public static String MPESA_CONSUMER_SECRET = null;
+    public static String MPESA_PASSKEY = null;
+    public static String MPESA_SHORTCODE = null;
+    public static String MPESA_CALLBACK_URL = null;
+
+    // Put your Mastercard production merchant id & key
+    public static String MASTERCARD_MERCHANT_ID = null;
+    public static String MASTERCARD_API_KEY = null;
+    public static String MASTERCARD_API_SECRET = null;
+
     // Set default country code, currency code and sign
     public static String COUNTRY_CODE = "+254";
     public static String CURRENCY_CODE = "USD";
@@ -31,7 +43,12 @@ public class AppConstant {
     // Set default app configuration
     public static int MAINTENANCE_MODE = 0;     // (0 for Off, 1 for On)
     public static int WALLET_MODE =  0;         // (0 for Enable, 1 for Disable)
-    public static int MODE_OF_PAYMENT = 0;      // (0 for PayTm, 1 for PayU, 2 for RazorPay)
+    public static final int PAYMENT_GATEWAY_PAYTM = 0;
+    public static final int PAYMENT_GATEWAY_PAYU = 1;
+    public static final int PAYMENT_GATEWAY_RAZORPAY = 2;
+    public static final int PAYMENT_GATEWAY_MPESA = 3;
+    public static final int PAYMENT_GATEWAY_MASTERCARD = 4;
+    public static int MODE_OF_PAYMENT = PAYMENT_GATEWAY_PAYTM;      // (0 for PayTm, 1 for PayU, 2 for RazorPay, 3 for Mpesa, 4 for Mastercard)
 
     // Set Refer Program
     public static int MIN_JOIN_LIMIT = 100;     // (In Amount)
