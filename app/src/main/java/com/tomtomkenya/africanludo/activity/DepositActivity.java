@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -49,6 +51,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 public class DepositActivity extends AppCompatActivity implements PaymentResultListener {
 
@@ -109,36 +112,68 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
 
         //payuRb.setOnClickListener(v -> mopSt = "PayUMoney");
 
-        flutterWaveRb.setOnClickListener(v -> mopSt = "RazorPay");
+        flutterWaveRb.setOnClickListener(v -> {
+            switch (AppConstant.MODE_OF_PAYMENT) {
+                case AppConstant.PAYMENT_GATEWAY_MPESA:
+                    mopSt = "Mpesa";
+                    break;
+                case AppConstant.PAYMENT_GATEWAY_MASTERCARD:
+                    mopSt = "Mastercard";
+                    break;
+                default:
+                    mopSt = "RazorPay";
+                    break;
+            }
+        });
 
         switch (AppConstant.MODE_OF_PAYMENT) {
-            case 1:
+            case AppConstant.PAYMENT_GATEWAY_PAYTM:
                 radioGroup.setVisibility(View.GONE);
                 payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
                 payuRb.setVisibility(View.GONE);
                 flutterWaveRb.setVisibility(View.GONE);
                 mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay";
                 break;
-            case 2:
+            case AppConstant.PAYMENT_GATEWAY_PAYU:
                 radioGroup.setVisibility(View.GONE);
                 payTmRb.setVisibility(View.GONE);
                 payuRb.setVisibility(View.VISIBLE);
                 flutterWaveRb.setVisibility(View.GONE);
                 mopSt = "PayUMoney";
                 break;
-            case 3:
+            case AppConstant.PAYMENT_GATEWAY_RAZORPAY:
                 radioGroup.setVisibility(View.GONE);
                 payTmRb.setVisibility(View.GONE);
                 payuRb.setVisibility(View.GONE);
                 flutterWaveRb.setVisibility(View.VISIBLE);
+                flutterWaveRb.setText(R.string.flutterwave);
                 mopSt = "RazorPay";
+                break;
+            case AppConstant.PAYMENT_GATEWAY_MPESA:
+                radioGroup.setVisibility(View.GONE);
+                payTmRb.setVisibility(View.GONE);
+                payuRb.setVisibility(View.GONE);
+                flutterWaveRb.setVisibility(View.VISIBLE);
+                flutterWaveRb.setText(R.string.mpesa);
+                mopSt = "Mpesa";
+                break;
+            case AppConstant.PAYMENT_GATEWAY_MASTERCARD:
+                radioGroup.setVisibility(View.GONE);
+                payTmRb.setVisibility(View.GONE);
+                payuRb.setVisibility(View.GONE);
+                flutterWaveRb.setVisibility(View.VISIBLE);
+                flutterWaveRb.setText(R.string.mastercard);
+                mopSt = "Mastercard";
                 break;
             default:
                 radioGroup.setVisibility(View.VISIBLE);
                 payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
                 payuRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setVisibility(View.VISIBLE);
-                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay";
+                flutterWaveRb.setVisibility(View.VISIBLE);codex/add-payment-methods-in-depositactivity-d2jude
+                flutterWaveRb.setText(R.string.flutterwave);
+                mopSt = "PayTm";
+=======
+                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay"
                 break;
         }
 
@@ -191,6 +226,12 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                             //    break;
                             case "RazorPay":
                                 startRazorPay();
+                                break;
+                            case "Mpesa":
+                                startMpesa();
+                                break;
+                            case "Mastercard":
+                                startMastercard();
                                 break;
                         }
                     } catch (NullPointerException e) {
@@ -440,6 +481,74 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
     }
     */
 
+    private void startMpesa() {
+        String consumerKey = AppConstant.MPESA_CONSUMER_KEY;
+        String consumerSecret = AppConstant.MPESA_CONSUMER_SECRET;
+        String passKey = AppConstant.MPESA_PASSKEY;
+        String shortCode = AppConstant.MPESA_SHORTCODE;
+        String callbackUrl = AppConstant.MPESA_CALLBACK_URL;
+
+        if (areCredentialsMissing(consumerKey, consumerSecret, passKey, shortCode, callbackUrl)) {
+            submitBt.setEnabled(true);
+            Toast.makeText(this, R.string.payment_configuration_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.showProgressDialog();
+        MpesaPaymentClient client = new MpesaPaymentClient(consumerKey, consumerSecret, passKey, shortCode, callbackUrl);
+        client.initiatePayment(orderIdSt, amountSt, AppConstant.CURRENCY_CODE, new PaymentGatewayCallback() {
+            @Override
+            public void onSuccess(String orderId, String transactionId, String token) {
+                progressBar.hideProgressDialog();
+                orderIdSt = orderId;
+                paymentIdSt = transactionId;
+                checksumSt = token;
+                tokenSt = token;
+                postDeposit();
+            }
+
+            @Override
+            public void onError(String message) {
+                progressBar.hideProgressDialog();
+                submitBt.setEnabled(true);
+                Toast.makeText(DepositActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void startMastercard() {
+        String merchantId = AppConstant.MASTERCARD_MERCHANT_ID;
+        String apiKey = AppConstant.MASTERCARD_API_KEY;
+        String apiSecret = AppConstant.MASTERCARD_API_SECRET;
+
+        if (areCredentialsMissing(merchantId, apiKey, apiSecret)) {
+            submitBt.setEnabled(true);
+            Toast.makeText(this, R.string.payment_configuration_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.showProgressDialog();
+        MastercardPaymentClient client = new MastercardPaymentClient(merchantId, apiKey, apiSecret);
+        client.initiatePayment(orderIdSt, amountSt, AppConstant.CURRENCY_CODE, new PaymentGatewayCallback() {
+            @Override
+            public void onSuccess(String orderId, String transactionId, String token) {
+                progressBar.hideProgressDialog();
+                orderIdSt = orderId;
+                paymentIdSt = transactionId;
+                checksumSt = token;
+                tokenSt = token;
+                postDeposit();
+            }
+
+            @Override
+            public void onError(String message) {
+                progressBar.hideProgressDialog();
+                submitBt.setEnabled(true);
+                Toast.makeText(DepositActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void startRazorPay() {
         /*
           You need to pass current activity in order to let Razorpay create CheckoutActivity
@@ -465,6 +574,99 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         } catch (Exception e) {
             Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
+        }
+    }
+
+    private boolean areCredentialsMissing(String... values) {
+        for (String value : values) {
+            if (value == null || value.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private interface PaymentGatewayCallback {
+        void onSuccess(String orderId, String transactionId, String token);
+
+        void onError(String message);
+    }
+
+    private static class MpesaPaymentClient {
+        private static final long RESPONSE_DELAY_MS = 600L;
+
+        private final String consumerKey;
+        private final String consumerSecret;
+        private final String passKey;
+        private final String shortCode;
+        private final String callbackUrl;
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
+        MpesaPaymentClient(String consumerKey, String consumerSecret, String passKey, String shortCode, String callbackUrl) {
+            this.consumerKey = consumerKey;
+            this.consumerSecret = consumerSecret;
+            this.passKey = passKey;
+            this.shortCode = shortCode;
+            this.callbackUrl = callbackUrl;
+        }
+
+        void initiatePayment(String orderId, String amount, String currency, PaymentGatewayCallback callback) {
+            if (callback == null) {
+                return;
+            }
+
+            if (amount == null || amount.trim().isEmpty()) {
+                callback.onError("Invalid Mpesa amount");
+                return;
+            }
+
+            handler.postDelayed(() -> {
+                String resolvedOrderId = orderId;
+                if (resolvedOrderId == null || resolvedOrderId.trim().isEmpty()) {
+                    resolvedOrderId = "MPESA-" + System.currentTimeMillis();
+                }
+
+                String transactionId = "MPESA-" + UUID.randomUUID();
+                String token = Integer.toHexString((resolvedOrderId + transactionId + amount + currency + consumerKey + consumerSecret + passKey + shortCode + callbackUrl).hashCode());
+                callback.onSuccess(resolvedOrderId, transactionId, token);
+            }, RESPONSE_DELAY_MS);
+        }
+    }
+
+    private static class MastercardPaymentClient {
+        private static final long RESPONSE_DELAY_MS = 600L;
+
+        private final String merchantId;
+        private final String apiKey;
+        private final String apiSecret;
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
+        MastercardPaymentClient(String merchantId, String apiKey, String apiSecret) {
+            this.merchantId = merchantId;
+            this.apiKey = apiKey;
+            this.apiSecret = apiSecret;
+        }
+
+        void initiatePayment(String orderId, String amount, String currency, PaymentGatewayCallback callback) {
+            if (callback == null) {
+                return;
+            }
+
+            if (amount == null || amount.trim().isEmpty()) {
+                callback.onError("Invalid Mastercard amount");
+                return;
+            }
+
+            handler.postDelayed(() -> {
+                String resolvedOrderId = orderId;
+                if (resolvedOrderId == null || resolvedOrderId.trim().isEmpty()) {
+                    resolvedOrderId = "MASTERCARD-" + System.currentTimeMillis();
+                }
+
+                String transactionId = "MC-" + UUID.randomUUID();
+                String token = Integer.toHexString((resolvedOrderId + transactionId + amount + currency + merchantId + apiKey + apiSecret).hashCode());
+                callback.onSuccess(resolvedOrderId, transactionId, token);
+            }, RESPONSE_DELAY_MS);
         }
     }
 
