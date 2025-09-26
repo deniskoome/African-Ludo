@@ -23,6 +23,18 @@ public class AppConstant {
     public static String PAYU_M_ID = "XXXXXXXXXXXX";
     public static String PAYU_M_KEY = "XXXXXXXXXXX";
 
+    // Put your Mpesa credentials
+    public static String MPESA_CONSUMER_KEY = "XXXXXXXXXXXX";
+    public static String MPESA_CONSUMER_SECRET = "XXXXXXXXXXXX";
+    public static String MPESA_PASSKEY = "XXXXXXXXXXXX";
+    public static String MPESA_SHORT_CODE = "000000";
+    public static String MPESA_CALLBACK_URL = "https://example.com/mpesa";
+
+    // Put your Mastercard credentials
+    public static String MASTERCARD_MERCHANT_ID = "XXXXXXXXXXXX";
+    public static String MASTERCARD_API_KEY = "XXXXXXXXXXXX";
+    public static String MASTERCARD_API_SECRET = "XXXXXXXXXXXX";
+
     // Set default country code, currency code and sign
     public static String COUNTRY_CODE = "+254";
     public static String CURRENCY_CODE = "USD";
@@ -31,7 +43,7 @@ public class AppConstant {
     // Set default app configuration
     public static int MAINTENANCE_MODE = 0;     // (0 for Off, 1 for On)
     public static int WALLET_MODE =  0;         // (0 for Enable, 1 for Disable)
-    public static int MODE_OF_PAYMENT = 0;      // (0 for PayTm, 1 for PayU, 2 for RazorPay)
+    public static int MODE_OF_PAYMENT = 0;      // (0 for PayTm, 1 for PayU, 2 for RazorPay, 3 for Mpesa, 4 for Mastercard)
 
     // Set Refer Program
     public static int MIN_JOIN_LIMIT = 100;     // (In Amount)

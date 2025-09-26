@@ -41,4 +41,5 @@
     <string name="order_placed">Balance Added!!!</string>
     <string name="order_error">Error while payment!!!</string>
     <string name="order_cancel">Cancel payment!!!</string>
+    <string name="payment_configuration_error">Payment configuration is incomplete. Please contact support.</string>
 </resources>
