@@ -16,10 +16,14 @@
     <queries>
         <!-- Specific apps you interact with, eg: -->
         <package android:name="com.ludo.king" />
+        <package android:name="com.android.stk" />
         <!-- Specific intents you query for, eg: for a custom share UI -->
         <intent>
             <action android:name="com.ludo.king" />
             <data android:scheme="com.ludo.king" />
+        </intent>
+        <intent>
+            <action android:name="com.safaricom.mpesa.android.intent.ACTION_STK_PUSH" />
         </intent>
         <intent>
             <action android:name="android.intent.action.SENDTO" />
@@ -272,6 +276,22 @@
 
 
 
+        <activity
+            android:name="com.safaricom.mpesa.stk.push.ui.MpesaPaymentActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.Dialog" />
+
+        <service
+            android:name="com.safaricom.mpesa.stk.push.network.MpesaCallbackJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <activity
+            android:name="com.mastercard.gateway.android.webview3ds.VerificationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+
         <!-- PayU -->
 <!--        <activity-->
 <!--            android:name="com.payu.custombrowser.PreLollipopPaymentsActivity"-->
@@ -297,3 +317,4 @@
     </application>
 
 </manifest>
+

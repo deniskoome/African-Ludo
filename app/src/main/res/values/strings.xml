@@ -41,4 +41,5 @@
     <string name="order_placed">Balance Added!!!</string>
     <string name="order_error">Error while payment!!!</string>
     <string name="order_cancel">Cancel payment!!!</string>
+    <string name="paytm_disabled_message">Paytm support is disabled in this build.</string>
 </resources>
