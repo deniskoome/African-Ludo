@@ -13,9 +13,11 @@ import com.tomtomkenya.africanludo.model.Token;
 import com.tomtomkenya.africanludo.model.UserModel;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -119,6 +121,27 @@ public interface ApiCalling {
     Call<UserModel> updateUserProfileToken(
             @Field("id") String id,
             @Field("fcm_token") String fcm_token);
+
+    @FormUrlEncoded
+    @POST(ApiConstant.POST_DEVICE_REGISTER)
+    Call<UserModel> registerDeviceToken(
+            @Field("userId") String userId,
+            @Field("token") String token);
+
+    @FormUrlEncoded
+    @POST(ApiConstant.POST_DEVICE_DELETE)
+    Call<UserModel> deleteDeviceToken(
+            @Field("userId") String userId,
+            @Field("token") String token);
+
+    @FormUrlEncoded
+    @POST(ApiConstant.POST_PUSH_SEND)
+    Call<Void> sendGameplayPush(
+            @Field("userId") String userId,
+            @Field("type") String type,
+            @Field("title") String title,
+            @Field("body") String body,
+            @FieldMap Map<String, String> metadata);
 
     @FormUrlEncoded
     @POST(ApiConstant.POST_UPDATE_PHOTO)

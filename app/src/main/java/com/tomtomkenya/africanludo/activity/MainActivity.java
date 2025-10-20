@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tomtomkenya.africanludo.helper.AppConstant;
+import com.tomtomkenya.africanludo.helper.NotificationPermissionHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tomtomkenya.africanludo.R;
 import com.tomtomkenya.africanludo.fragment.MatchFragment;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public FrameLayout notificationFl;
     public TextView counterTv;
     public SwitchCompat switchNotification;
+    private NotificationPermissionHelper notificationPermissionHelper;
 
     public static BottomNavigationView navigationView;
     public boolean doubleBackToExitPressedOnce = false;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         notificationFl = toolbar.findViewById(R.id.notificationFl);
         counterTv = toolbar.findViewById(R.id.counterTv);
         switchNotification = findViewById(R.id.switchNotification);
+        notificationPermissionHelper = new NotificationPermissionHelper(this, () -> {});
 
         notificationFl.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("SUB_STATUS", "true");
                 editor.apply();
+                notificationPermissionHelper.ensurePermission();
             }
             else{
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(AppConstant.TOPIC_GLOBAL);
@@ -124,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
                 editor.apply();
             }
         });
+
+        notificationPermissionHelper.ensurePermission();
 
     }
 

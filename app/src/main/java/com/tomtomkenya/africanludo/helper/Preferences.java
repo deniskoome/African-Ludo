@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.tomtomkenya.africanludo.activity.LoginActivity;
+import com.tomtomkenya.africanludo.services.PushTokenManager;
 
 public class Preferences {
 
@@ -59,6 +60,7 @@ public class Preferences {
 
     // The constant KEY_IS_AUTO_LOGIN
     public static final String KEY_IS_AUTO_LOGIN = "KEY_IS_AUTO_LOGIN";
+    public static final String KEY_DEVICE_TOKEN = "KEY_DEVICE_TOKEN";
 
 
     /**
@@ -116,6 +118,7 @@ public class Preferences {
     }
 
     public void setlogout() {
+        new PushTokenManager(context).unregisterToken();
         SharedPreferences.Editor sharedPrefEditor = getSharedPref().edit();
         sharedPrefEditor.clear();
         sharedPrefEditor.apply();

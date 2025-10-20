@@ -48,4 +48,6 @@
     <string name="payment_option_not_supported">Selected payment option is not supported on this device.</string>
 
     <string name="paytm_disabled_message">Paytm support is disabled in this build.</string>
+    <string name="notification_channel_gameplay">Gameplay alerts</string>
+    <string name="notification_channel_gameplay_description">Real-time match updates and wallet alerts.</string>
 </resources>

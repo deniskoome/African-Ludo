@@ -24,6 +24,9 @@ public class ApiConstant {
     public static final String POST_DEPOSIT = "api/post_deposit";
     public static final String POST_WITHDRAW = "api/post_withdraw";
     public static final String POST_BALANCE = "api/post_balance";
+    public static final String POST_DEVICE_REGISTER = "api/devices";
+    public static final String POST_DEVICE_DELETE = "api/devices/delete";
+    public static final String POST_PUSH_SEND = "api/push/send";
 
     public static final String GET_MATCH_UPCOMING = "api/get_match_upcoming";
     public static final String GET_MATCH_ONGOING = "api/get_match_ongoing";
