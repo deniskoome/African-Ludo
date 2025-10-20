@@ -1,147 +1,202 @@
 package com.tomtomkenya.africanludo.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.appcompat.widget.Toolbar;
-import androidx.browser.customtabs.CustomTabsIntent;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
-import com.tomtomkenya.africanludo.helper.AppConstant;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.tomtomkenya.africanludo.R;
-import com.tomtomkenya.africanludo.fragment.MatchFragment;
-import com.tomtomkenya.africanludo.fragment.SettingFragment;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.tomtomkenya.africanludo.R;
+import com.tomtomkenya.africanludo.helper.AppConstant;
+import com.tomtomkenya.africanludo.helper.ThemePreferences;
 
 import java.util.Objects;
 
+/**
+ * Hosts the modernised navigation shell with Material 3 styling and theming support.
+ */
 public class MainActivity extends AppCompatActivity {
 
-    public Toolbar toolbar;
-    public FrameLayout notificationFl;
-    public TextView counterTv;
-    public SwitchCompat switchNotification;
+    private FirebaseAnalytics firebaseAnalytics;
+    private NavigationBarView navigationBarView;
+    private FloatingActionButton quickPlayFab;
+    private MaterialToolbar toolbar;
+    private boolean doubleBackToExitPressedOnce = false;
+    private String clickAction = "default";
+    private SharedPreferences notificationPreferences;
+    private NavController navController;
 
-    public static BottomNavigationView navigationView;
-    public boolean doubleBackToExitPressedOnce = false;
-
-    public SharedPreferences preferences;
-    public String clickAction;
-
-    public String isSubscribe;
-    public FirebaseAnalytics mFirebaseAnalytics;
-
-    @SuppressLint("NonConstantResourceId")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ThemePreferences.applyStoredTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        try {
-            clickAction = Objects.requireNonNull(getIntent().getExtras()).getString("click_action","default");
-        }catch (NullPointerException e){
-            clickAction = "default";
-        }
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle analyticsBundle = new Bundle();
+        analyticsBundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "MainActivity");
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, analyticsBundle);
+        notificationPreferences = getSharedPreferences("Setting", Context.MODE_PRIVATE);
+        clickAction = extractClickAction();
 
         toolbar = findViewById(R.id.toolbar);
-        notificationFl = toolbar.findViewById(R.id.notificationFl);
-        counterTv = toolbar.findViewById(R.id.counterTv);
-        switchNotification = findViewById(R.id.switchNotification);
+        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(this::onToolbarMenuItemClick);
 
-        notificationFl.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
-            startActivity(intent);
-        });
+        navigationBarView = findViewById(R.id.navigationView);
+        quickPlayFab = findViewById(R.id.fabQuickPlay);
 
-        Bundle bundle = new Bundle();
-        bundle.putString("click_action", clickAction);
-
-        MatchFragment matchFragment = new MatchFragment();
-        matchFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, matchFragment).commit();
-
-        navigationView = findViewById(R.id.navigationView);
-        navigationView.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.navigation_game:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, new MatchFragment()).commit();
-                    return true;
-                case R.id.navigation_leaderboard:
-                    try {
-                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                        CustomTabsIntent customTabsIntent = builder.build();
-                        customTabsIntent.launchUrl(MainActivity.this, Uri.parse(AppConstant.HOW_TO_PLAY));
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    return true;
-                case R.id.navigation_more:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,new SettingFragment()).commit();
-                    return true;
-            }
-            return false;
-        });
-
-        SharedPreferences sharedPreferences = getSharedPreferences("Setting", Context.MODE_PRIVATE);
-        isSubscribe = sharedPreferences.getString("SUB_STATUS", "true");
-
-        switchNotification.setChecked(!TextUtils.isEmpty(isSubscribe) && !isSubscribe.equals("false"));
-
-        if (switchNotification.isChecked()){
-            FirebaseMessaging.getInstance().subscribeToTopic(AppConstant.TOPIC_GLOBAL);
-        }
-        else {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(AppConstant.TOPIC_GLOBAL);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_main);
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
+            setupNavigation();
         }
 
-        switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (switchNotification.isChecked()){
-                FirebaseMessaging.getInstance().subscribeToTopic(AppConstant.TOPIC_GLOBAL);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("SUB_STATUS", "true");
-                editor.apply();
-            }
-            else{
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(AppConstant.TOPIC_GLOBAL);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("SUB_STATUS", "false");
-                editor.apply();
-            }
-        });
-
+        quickPlayFab.setOnClickListener(view -> navigateToPlay("MainActivity"));
+        initNotificationPreference();
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
+    private void setupNavigation() {
+        navigationBarView.setOnItemSelectedListener(item -> {
+            if (navController == null) {
+                return false;
+            }
+            if (navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == item.getItemId()) {
+                return true;
+            }
+            if (item.getItemId() == R.id.playFragment) {
+                navigateToPlay(clickAction);
+                return true;
+            }
+            navController.navigate(item.getItemId(), null, defaultNavOptions());
+            return true;
+        });
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> syncBottomNavigation(destination));
+
+        if (!TextUtils.isEmpty(clickAction) && !"default".equalsIgnoreCase(clickAction)) {
+            navigateToPlay(clickAction);
+            navigationBarView.setSelectedItemId(R.id.playFragment);
+        } else {
+            navigationBarView.setSelectedItemId(R.id.homeFragment);
+        }
+    }
+
+    private void syncBottomNavigation(@NonNull NavDestination destination) {
+        if (destination.getId() == R.id.playFragment) {
+            navigationBarView.setSelectedItemId(R.id.playFragment);
+        } else if (destination.getId() == R.id.walletFragment) {
+            navigationBarView.setSelectedItemId(R.id.walletFragment);
+        } else if (destination.getId() == R.id.profileFragment) {
+            navigationBarView.setSelectedItemId(R.id.profileFragment);
+        } else if (destination.getId() == R.id.leaderboardFragment) {
+            navigationBarView.setSelectedItemId(R.id.leaderboardFragment);
+        } else {
+            navigationBarView.setSelectedItemId(R.id.homeFragment);
+        }
+    }
+
+    private void navigateToPlay(String action) {
+        if (navController == null) {
+            return;
+        }
+        Bundle bundle = new Bundle();
+        bundle.putString("click_action", action);
+        navController.navigate(R.id.playFragment, bundle, defaultNavOptions());
+        clickAction = "default";
+    }
+
+    private NavOptions defaultNavOptions() {
+        return new NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(navController.getGraph().getStartDestinationId(), false)
+                .build();
+    }
+
+    private boolean onToolbarMenuItemClick(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_notifications) {
+            showNotificationDialog();
+            return true;
+        } else if (item.getItemId() == R.id.action_theme) {
+            ThemePreferences.toggleTheme(this);
+            recreate();
+            return true;
+        }
+        return false;
+    }
+
+    private void showNotificationDialog() {
+        boolean subscribed = notificationPreferences.getString("SUB_STATUS", "true").equals("true");
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_notification_preferences, null);
+        MaterialSwitch notificationSwitch = dialogView.findViewById(R.id.switchNotificationDialog);
+        notificationSwitch.setChecked(subscribed);
+        notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> updateNotificationSubscription(isChecked));
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.notifications)
+                .setView(dialogView)
+                .setPositiveButton(R.string.open_notifications, (dialog, which) -> {
+                    startActivity(new Intent(this, NotificationActivity.class));
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void initNotificationPreference() {
+        boolean subscribed = notificationPreferences.getString("SUB_STATUS", "true").equals("true");
+        updateNotificationSubscription(subscribed);
+    }
+
+    private void updateNotificationSubscription(boolean enable) {
+        if (enable) {
+            FirebaseMessaging.getInstance().subscribeToTopic(AppConstant.TOPIC_GLOBAL);
+        } else {
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(AppConstant.TOPIC_GLOBAL);
+        }
+        notificationPreferences.edit().putString("SUB_STATUS", enable ? "true" : "false").apply();
+    }
+
+    private String extractClickAction() {
+        try {
+            return Objects.requireNonNull(getIntent().getExtras()).getString("click_action", "default");
+        } catch (Exception exception) {
+            return "default";
+        }
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (navController != null && navController.popBackStack()) {
+            return;
+        }
         if (doubleBackToExitPressedOnce) {
-            finish(); return;
+            super.onBackPressed();
+            finish();
+            return;
         }
 
         doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(this, R.string.press_back_again, Toast.LENGTH_SHORT).show();
         new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 1500);
     }
 }

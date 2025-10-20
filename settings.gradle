@@ -1,2 +1,3 @@
 include ':app'
+include ':ui-components'
 rootProject.name = "Dream Ludo"

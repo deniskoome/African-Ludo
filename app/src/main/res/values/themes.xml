@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Ludo" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ludo_primary</item>
+        <item name="colorOnPrimary">@color/ludo_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ludo_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ludo_on_primary_container</item>
+        <item name="colorSecondary">@color/ludo_secondary</item>
+        <item name="colorOnSecondary">@color/ludo_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/ludo_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ludo_on_secondary_container</item>
+        <item name="colorTertiary">@color/ludo_tertiary</item>
+        <item name="colorOnTertiary">@color/ludo_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/ludo_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/ludo_on_tertiary_container</item>
+        <item name="colorError">@color/ludo_error</item>
+        <item name="colorOnError">@color/ludo_on_error</item>
+        <item name="colorErrorContainer">@color/ludo_error_container</item>
+        <item name="colorOnErrorContainer">@color/ludo_on_error_container</item>
+        <item name="android:colorBackground">@color/ludo_background</item>
+        <item name="colorOnBackground">@color/ludo_on_background</item>
+        <item name="colorSurface">@color/ludo_surface</item>
+        <item name="colorOnSurface">@color/ludo_on_surface</item>
+        <item name="colorSurfaceVariant">@color/ludo_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/ludo_on_surface_variant</item>
+        <item name="colorOutline">@color/ludo_outline</item>
+        <item name="colorOutlineVariant">@color/ludo_outline_variant</item>
+        <item name="colorInverseSurface">@color/ludo_inverse_surface</item>
+        <item name="colorInverseOnSurface">@color/ludo_inverse_on_surface</item>
+        <item name="colorInversePrimary">@color/ludo_inverse_primary</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="toolbarStyle">@style/Widget.Ludo.Toolbar</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextStyle.Ludo.HeadlineMedium</item>
+        <item name="textAppearanceBodyLarge">@style/TextStyle.Ludo.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextStyle.Ludo.BodyMedium</item>
+        <item name="textAppearanceTitleLarge">@style/TextStyle.Ludo.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextStyle.Ludo.TitleMedium</item>
+        <item name="textAppearanceLabelLarge">@style/TextStyle.Ludo.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextStyle.Ludo.LabelMedium</item>
+        <item name="bottomAppBarStyle">@style/Widget.Ludo.BottomNavigation</item>
+        <item name="materialButtonStyle">@style/Widget.Ludo.Button</item>
+        <item name="snackbarStyle">@style/Widget.Ludo.Snackbar</item>
+        <item name="textInputStyle">@style/Widget.Ludo.TextField</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Ludo.App</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">@bool/is_light_theme</item>
+        <item name="android:windowLightNavigationBar">@bool/is_light_theme</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <style name="Widget.Ludo.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:popupTheme">@style/ThemeOverlay.Material3.Toolbar.Surface</item>
+        <item name="titleTextAppearance">@style/TextStyle.Ludo.TitleLarge</item>
+    </style>
+
+    <style name="Widget.Ludo.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemRippleColor">@color/bottom_nav_ripple</item>
+    </style>
+
+    <style name="Widget.Ludo.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.MediumComponent</item>
+    </style>
+
+    <style name="Widget.Ludo.Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="backgroundTint">@color/ludo_inverse_surface</item>
+        <item name="textColor">@color/ludo_inverse_on_surface</item>
+    </style>
+
+    <style name="Widget.Ludo.TextField" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.MediumComponent</item>
+    </style>
+
+    <style name="Animation.Ludo.App" parent="Animation.Material3.DynamicColorsFade" />
+
+    <bool name="is_light_theme" tools:ignore="PrivateResource">true</bool>
+</resources>
