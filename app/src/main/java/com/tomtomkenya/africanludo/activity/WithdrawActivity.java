@@ -175,7 +175,7 @@ public class WithdrawActivity extends AppCompatActivity {
                     List<UserModel.Result> res;
                     if (legalData != null) {
                         res = legalData.getResult();
-                        if (res.get(0).getSuccess() == "1") {
+                        if ("1".equals(res.get(0).getSuccess())) {
                             deposit = res.get(0).getDeposit_bal();
                             winning = res.get(0).getWon_bal();
                             bonus = res.get(0).getBonus_bal();

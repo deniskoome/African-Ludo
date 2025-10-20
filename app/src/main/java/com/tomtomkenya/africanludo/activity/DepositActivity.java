@@ -258,7 +258,7 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                     List<UserModel.Result> res;
                     if (legalData != null) {
                         res = legalData.getResult();
-                        if (res.get(0).getSuccess() == "1") {
+                        if ("1".equals(res.get(0).getSuccess())) {
                             if (res.get(0).getIs_block() == 1) {
                                 Preferences.getInstance(DepositActivity.this).setString(Preferences.KEY_IS_AUTO_LOGIN,"0");
 
