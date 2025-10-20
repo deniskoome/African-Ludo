@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/spacing_4">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.tomtomkenya.ludouikit.components.LudoCard
+            android:id="@+id/cardWelcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_3"
+            android:padding="@dimen/spacing_4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textWelcome"
+                    style="@style/TextStyle.Ludo.TitleLarge"
+                    android:textColor="@color/ludo_on_surface"
+                    android:text="@string/home_welcome_default"
+                    android:contentDescription="@string/home_welcome_default" />
+
+                <TextView
+                    android:id="@+id/textSubWelcome"
+                    style="@style/TextStyle.Ludo.BodyMedium"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:textColor="@color/ludo_on_surface_variant"
+                    android:text="@string/home_subtitle" />
+            </LinearLayout>
+        </com.tomtomkenya.ludouikit.components.LudoCard>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2"
+            android:layout_marginBottom="@dimen/spacing_3">
+
+            <com.tomtomkenya.ludouikit.components.LudoCard
+                android:id="@+id/cardWallet"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/spacing_2"
+                android:layout_weight="1"
+                android:padding="@dimen/spacing_4">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/TextStyle.Ludo.LabelMedium"
+                        android:text="@string/home_wallet_balance" />
+
+                    <TextView
+                        android:id="@+id/textWalletBalance"
+                        style="@style/TextStyle.Ludo.TitleLarge"
+                        android:layout_marginTop="@dimen/spacing_1"
+                        android:textColor="@color/ludo_primary"
+                        android:text="KES 0" />
+                </LinearLayout>
+            </com.tomtomkenya.ludouikit.components.LudoCard>
+
+            <com.tomtomkenya.ludouikit.components.LudoCard
+                android:id="@+id/cardBonus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="@dimen/spacing_4">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/TextStyle.Ludo.LabelMedium"
+                        android:text="@string/home_bonus_balance" />
+
+                    <TextView
+                        android:id="@+id/textBonusBalance"
+                        style="@style/TextStyle.Ludo.TitleLarge"
+                        android:layout_marginTop="@dimen/spacing_1"
+                        android:textColor="@color/ludo_secondary"
+                        android:text="KES 0" />
+                </LinearLayout>
+            </com.tomtomkenya.ludouikit.components.LudoCard>
+        </LinearLayout>
+
+        <com.tomtomkenya.ludouikit.components.LudoCard
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextStyle.Ludo.TitleMedium"
+                    android:text="@string/home_quick_actions" />
+
+                <com.tomtomkenya.ludouikit.components.LudoButton
+                    android:id="@+id/buttonQuickPlay"
+                    style="@style/Widget.Ludo.Button"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:text="@string/home_play_now" />
+
+                <com.tomtomkenya.ludouikit.components.LudoButton
+                    android:id="@+id/buttonQuickDeposit"
+                    style="@style/Widget.Ludo.Button"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="@string/home_top_up"
+                    android:backgroundTint="@color/ludo_secondary" />
+            </LinearLayout>
+        </com.tomtomkenya.ludouikit.components.LudoCard>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

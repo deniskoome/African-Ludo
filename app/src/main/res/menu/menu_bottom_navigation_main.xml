@@ -2,18 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_game"
-        android:icon="@drawable/ic_game"
-        android:title="Game" />
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/nav_home" />
 
     <item
-        android:id="@+id/navigation_leaderboard"
-        android:icon="@drawable/ic_method"
-        android:title="How To Play?" />
+        android:id="@+id/walletFragment"
+        android:icon="@drawable/ic_nav_wallet"
+        android:title="@string/nav_wallet" />
 
     <item
-        android:id="@+id/navigation_more"
-        android:icon="@drawable/ic_more"
-        android:title="More" />
+        android:id="@+id/playFragment"
+        android:icon="@drawable/ic_nav_play"
+        android:title="@string/nav_play" />
+
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_nav_profile"
+        android:title="@string/nav_profile" />
+
+    <item
+        android:id="@+id/leaderboardFragment"
+        android:icon="@drawable/ic_nav_leaderboard"
+        android:title="@string/nav_leaderboard" />
 
 </menu>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeOverlay.Ludo.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Ludo.Medium</item>
+    </style>
+
+    <style name="ShapeAppearance.Ludo.Medium" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerSize">@dimen/ludo_corner_medium</item>
+    </style>
+</resources>

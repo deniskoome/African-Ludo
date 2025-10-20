@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.tomtomkenya.africanludo.helper.AppConstant;
+import com.tomtomkenya.africanludo.helper.ThemePreferences;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -29,6 +30,7 @@ public class MyApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        ThemePreferences.applyStoredTheme(this);
         initRetrofit();
         initGson();
     }

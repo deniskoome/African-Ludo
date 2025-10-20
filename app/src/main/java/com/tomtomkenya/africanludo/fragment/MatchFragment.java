@@ -1,96 +1,158 @@
 package com.tomtomkenya.africanludo.fragment;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.tomtomkenya.africanludo.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+/**
+ * Hosts the match tabs inside a modern MotionLayout with celebratory dice animation feedback.
+ */
 public class MatchFragment extends Fragment {
 
-    public View view;
-    public TabLayout tabLayout;
-    public ViewPager viewPager;
-    public ViewPagerAdapter pagerAdapter;
+    private static final long CELEBRATION_DURATION_MS = 3200L;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private MotionLayout motionLayout;
+    private LottieAnimationView celebrationLottie;
+    private Runnable hideCelebrationRunnable;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
 
-    }
+    private final int[] tabTitleResIds = new int[]{
+            R.string.match_tab_upcoming,
+            R.string.match_tab_ongoing,
+            R.string.match_tab_completed
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_match, container, false);
+        return inflater.inflate(R.layout.fragment_match, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        motionLayout = view.findViewById(R.id.matchMotionLayout);
+        celebrationLottie = view.findViewById(R.id.matchCelebrationLottie);
+        MaterialCardView celebrationCard = view.findViewById(R.id.matchCelebrationCard);
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
-        viewPager.setOffscreenPageLimit(3);
 
-        pagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        pagerAdapter.addFragment(new UpcomingFragment(),"UPCOMING");
-        pagerAdapter.addFragment(new OngoingFragment(),"ONGOING");
-        pagerAdapter.addFragment(new CompletedFragment(),"COMPLETED");
+        viewPager.setAdapter(new MatchPagerAdapter(this));
+        viewPager.setOffscreenPageLimit(tabTitleResIds.length);
 
-        viewPager.setAdapter(pagerAdapter);
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
+                tab.setText(getString(tabTitleResIds[position]))
+        ).attach();
+
+        celebrationCard.setOnClickListener(v -> {
+            if (motionLayout != null) {
+                motionLayout.transitionToStart();
+            }
+        });
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            String clickAction = bundle.getString("click_action","default");
-            if (clickAction.equals("MainActivity")) {
-                viewPager.setCurrentItem(1);
+            String clickAction = bundle.getString("click_action", "default");
+            if ("MainActivity".equals(clickAction)) {
+                viewPager.setCurrentItem(1, false);
+                triggerCelebration();
+            } else {
+                viewPager.setCurrentItem(0, false);
             }
-            else {
-                viewPager.setCurrentItem(0);
-            }
+        } else if (savedInstanceState == null) {
+            triggerCelebration();
         }
-
-        tabLayout.setupWithViewPager(viewPager);
-
-        return view;
     }
 
-    public static class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    /**
+     * Animates the celebration card into view and plays the dice roll feedback.
+     */
+    private void triggerCelebration() {
+        if (motionLayout == null) {
+            return;
+        }
+        motionLayout.post(() -> {
+            if (motionLayout == null) {
+                return;
+            }
+            motionLayout.transitionToEnd();
+            if (celebrationLottie != null) {
+                celebrationLottie.cancelAnimation();
+                celebrationLottie.setProgress(0f);
+                celebrationLottie.playAnimation();
+            }
+            scheduleHideCelebration();
+        });
+    }
 
-        ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+    /**
+     * Schedules the celebration card to gracefully retreat after a short delay.
+     */
+    private void scheduleHideCelebration() {
+        if (motionLayout == null) {
+            return;
+        }
+        if (hideCelebrationRunnable != null) {
+            motionLayout.removeCallbacks(hideCelebrationRunnable);
+        }
+        hideCelebrationRunnable = () -> {
+            if (motionLayout != null) {
+                motionLayout.transitionToStart();
+            }
+        };
+        motionLayout.postDelayed(hideCelebrationRunnable, CELEBRATION_DURATION_MS);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (motionLayout != null && hideCelebrationRunnable != null) {
+            motionLayout.removeCallbacks(hideCelebrationRunnable);
+        }
+        hideCelebrationRunnable = null;
+        celebrationLottie = null;
+        motionLayout = null;
+        tabLayout = null;
+        viewPager = null;
+    }
+
+    /**
+     * Lightweight ViewPager2 adapter bridging the legacy match fragments.
+     */
+    private static class MatchPagerAdapter extends androidx.viewpager2.adapter.FragmentStateAdapter {
+
+        MatchPagerAdapter(@NonNull Fragment fragment) {
+            super(fragment);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+        public Fragment createFragment(int position) {
+            switch (position) {
+                case 0:
+                    return new UpcomingFragment();
+                case 1:
+                    return new OngoingFragment();
+                default:
+                    return new CompletedFragment();
+            }
         }
 
         @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+        public int getItemCount() {
+            return 3;
         }
     }
 }

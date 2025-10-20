@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/spacing_4">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.tomtomkenya.ludouikit.components.LudoCard
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textProfileName"
+                    style="@style/TextStyle.Ludo.TitleLarge"
+                    android:text="Player" />
+
+                <TextView
+                    android:id="@+id/textProfileEmail"
+                    style="@style/TextStyle.Ludo.BodyMedium"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:textColor="@color/ludo_on_surface_variant"
+                    android:text="player@example.com" />
+
+                <TextView
+                    android:id="@+id/textProfilePhone"
+                    style="@style/TextStyle.Ludo.BodyMedium"
+                    android:layout_marginTop="@dimen/spacing_1"
+                    android:textColor="@color/ludo_on_surface_variant"
+                    android:text="+254" />
+            </LinearLayout>
+        </com.tomtomkenya.ludouikit.components.LudoCard>
+
+        <com.tomtomkenya.ludouikit.components.LudoCard
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_3"
+            android:padding="@dimen/spacing_4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextStyle.Ludo.TitleMedium"
+                    android:text="@string/profile_actions" />
+
+                <com.tomtomkenya.ludouikit.components.LudoButton
+                    android:id="@+id/buttonEditProfile"
+                    android:layout_marginTop="@dimen/spacing_3"
+                    android:text="@string/profile_view" />
+
+                <com.tomtomkenya.ludouikit.components.LudoButton
+                    android:id="@+id/buttonLogout"
+                    android:layout_marginTop="@dimen/spacing_2"
+                    android:text="@string/profile_logout"
+                    android:backgroundTint="@color/ludo_secondary" />
+            </LinearLayout>
+        </com.tomtomkenya.ludouikit.components.LudoCard>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

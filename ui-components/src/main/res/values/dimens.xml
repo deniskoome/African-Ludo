@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ludo_button_inset">8dp</dimen>
+    <dimen name="ludo_button_stroke">1dp</dimen>
+    <dimen name="ludo_corner_small">8dp</dimen>
+    <dimen name="ludo_corner_medium">16dp</dimen>
+    <dimen name="ludo_corner_large">24dp</dimen>
+    <dimen name="ludo_card_elevation">4dp</dimen>
+    <dimen name="ludo_card_stroke">1dp</dimen>
+    <dimen name="ludo_textfield_stroke">1dp</dimen>
+</resources>

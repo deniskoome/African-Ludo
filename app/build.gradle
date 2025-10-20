@@ -63,7 +63,12 @@ dependencies {
 
     // Google Design Library -----------------------------------------------------------------------
     implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'com.google.android.gms:play-services-auth:21.2.0'
+    implementation 'androidx.navigation:navigation-fragment:2.7.7'
+    implementation 'androidx.navigation:navigation-ui:2.7.7'
+    implementation project(':ui-components')
+    implementation 'com.airbnb.android:lottie:6.4.0'
 
     // Firebase Library ----------------------------------------------------------------------------
     implementation platform('com.google.firebase:firebase-bom:33.4.0')
