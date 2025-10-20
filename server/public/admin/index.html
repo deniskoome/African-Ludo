@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>African Ludo • Payment Gateways</title>
+  <link rel="stylesheet" href="/admin/style.css" />
+</head>
+<body>
+  <header class="page-header">
+    <h1>Payment Gateway Management</h1>
+    <p class="subtitle">Toggle availability, manage credentials, and validate integrations.</p>
+  </header>
+
+  <main>
+    <section class="gateway-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Gateway</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="gatewayTableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty" hidden>No gateways found.</div>
+    </section>
+  </main>
+
+  <template id="configFormTemplate">
+    <form class="config-form">
+      <div class="form-fields"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary">Save</button>
+        <button type="button" data-action="cancel" class="btn">Cancel</button>
+      </div>
+    </form>
+  </template>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button class="modal-close" data-action="close" aria-label="Close">×</button>
+      <h2 id="modalTitle">Configure Gateway</h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/admin/js/main.js" type="module"></script>
+</body>
+</html>
