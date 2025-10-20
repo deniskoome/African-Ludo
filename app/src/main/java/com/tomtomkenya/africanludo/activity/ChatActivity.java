@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -69,6 +70,7 @@ public class ChatActivity extends AppCompatActivity {
     private String mChatUser;
     private String mCurrentUserId;
     private String mMatchId;
+    private String mRoomId;
 
     public ImageButton mChatAddBtn;
     public ImageButton mChatSendBtn;
@@ -111,9 +113,11 @@ public class ChatActivity extends AppCompatActivity {
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUserId);
 
-        mChatUser = getIntent().getStringExtra("user_id");
-        String userName = getIntent().getStringExtra("user_name");
-        mMatchId = getIntent().getStringExtra("match_id");
+        Bundle extras = getIntent() != null ? getIntent().getExtras() : null;
+        mChatUser = extras != null ? extras.getString("user_id", "") : "";
+        String userName = extras != null ? extras.getString("user_name", getString(R.string.app_name)) : getString(R.string.app_name);
+        mMatchId = extras != null ? extras.getString("match_id", "") : "";
+        mRoomId = buildRoomId(mMatchId, mCurrentUserId, mChatUser);
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") View actionBarView = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -198,10 +202,17 @@ public class ChatActivity extends AppCompatActivity {
                 online = Objects.requireNonNull(dataSnapshot.child("online").getValue()).toString();
                 token = Objects.requireNonNull(dataSnapshot.child("device_token").getValue()).toString();
 
-                if(online.equals("true")) {
+                if (TextUtils.equals(online, "true")) {
                     mLastSeenView.setText("online");
                 } else {
-                    long lastTime = Long.parseLong(online);
+                    long lastTime = 0;
+                    if (TextUtils.isDigitsOnly(online)) {
+                        try {
+                            lastTime = Long.parseLong(online);
+                        } catch (NumberFormatException ignored) {
+                            lastTime = 0;
+                        }
+                    }
                     String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
 
                     try {
@@ -270,38 +281,72 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private String buildRoomId(String matchId, String userA, String userB) {
+        if (TextUtils.isEmpty(matchId) || TextUtils.isEmpty(userA) || TextUtils.isEmpty(userB)) {
+            return matchId + "_" + userA + "_" + userB;
+        }
+        long first = safeParseLong(userA);
+        long second = safeParseLong(userB);
+        if (first == Long.MIN_VALUE || second == Long.MIN_VALUE) {
+            String lower = userA.compareTo(userB) <= 0 ? userA : userB;
+            String higher = userA.compareTo(userB) <= 0 ? userB : userA;
+            return matchId + "_" + lower + "_" + higher;
+        }
+        long min = Math.min(first, second);
+        long max = Math.max(first, second);
+        return matchId + "_" + min + "_" + max;
+    }
+
+    private long safeParseLong(String value) {
+        if (TextUtils.isDigitsOnly(value)) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException ignored) {
+                return Long.MIN_VALUE;
+            }
+        }
+        return Long.MIN_VALUE;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == GALLERY_PICK && resultCode == RESULT_OK){
+            if (data == null || data.getData() == null) {
+                Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+                return;
+            }
             Uri imageUri = data.getData();
 
-            final String current_user_ref = "messages/" + mMatchId+"_"+mCurrentUserId + "/" + mMatchId+"_"+mChatUser;
-            final String chat_user_ref = "messages/" + mMatchId+"_"+mChatUser + "/" + mMatchId+"_"+mCurrentUserId;
+            final String currentUserRef = "messages/" + mRoomId + "/" + mCurrentUserId;
+            final String chatUserRef = "messages/" + mRoomId + "/" + mChatUser;
 
-            DatabaseReference user_message_push = mRootRef.child("messages").child(mMatchId+"_"+mCurrentUserId).child(mMatchId+"_"+mChatUser).push();
-            final String push_id = user_message_push.getKey();
+            DatabaseReference user_message_push = mRootRef.child("messages").child(mRoomId).child(mCurrentUserId).push();
+            final String push_id = user_message_push != null ? user_message_push.getKey() : null;
+            if (push_id == null) {
+                Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".jpg");
-            filepath.putFile(Objects.requireNonNull(imageUri)).addOnCompleteListener(task -> {
+            StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
+            filepath.putFile(imageUri).addOnCompleteListener(task -> {
 
                 if(task.isSuccessful()){
                     filepath.getDownloadUrl().addOnSuccessListener(uri -> {
-                        //Set value for new category if image upload and we can get download link
                         String download_url = uri.toString();
 
-                        Map messageMap = new HashMap();
+                        Map<String, Object> messageMap = new HashMap<>();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
                         messageMap.put("type", "image");
                         messageMap.put("time", ServerValue.TIMESTAMP);
                         messageMap.put("from", mCurrentUserId);
 
-                        Map messageUserMap = new HashMap();
-                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+                        Map<String, Object> messageUserMap = new HashMap<>();
+                        messageUserMap.put(currentUserRef + "/" + push_id, messageMap);
+                        messageUserMap.put(chatUserRef + "/" + push_id, messageMap);
 
                         mChatMessageView.setText("");
                         mRootRef.updateChildren(messageUserMap, (databaseError, databaseReference) -> {
@@ -311,17 +356,19 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
 
-                    });
+                    }).addOnFailureListener(e -> Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show());
+                } else {
+                    Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
                 }
 
-            });
+            }).addOnFailureListener(e -> Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show());
 
         }
 
     }
 
     private void loadMoreMessages() {
-        DatabaseReference messageRef = mRootRef.child("messages").child(mMatchId+"_"+mCurrentUserId).child(mMatchId+"_"+mChatUser);
+        DatabaseReference messageRef = mRootRef.child("messages").child(mRoomId).child(mCurrentUserId);
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
 
         messageQuery.addChildEventListener(new ChildEventListener() {
@@ -375,7 +422,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages() {
         try {
-            DatabaseReference messageRef = mRootRef.child("messages").child(mMatchId+"_"+mCurrentUserId).child(mMatchId+"_"+mChatUser);
+            DatabaseReference messageRef = mRootRef.child("messages").child(mRoomId).child(mCurrentUserId);
             Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
             messageQuery.addChildEventListener(new ChildEventListener() {
@@ -426,22 +473,26 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
 
         String message = mChatMessageView.getText().toString();
-        if(!TextUtils.isEmpty(message)){
+        if(!TextUtils.isEmpty(message) && !TextUtils.isEmpty(mRoomId) && !TextUtils.isEmpty(mChatUser)){
 
-            String current_user_ref = "messages/" + mMatchId+"_"+mCurrentUserId + "/" + mMatchId+"_"+mChatUser;
-            String chat_user_ref = "messages/" + mMatchId+"_"+mChatUser + "/" + mMatchId+"_"+mCurrentUserId;
+            String current_user_ref = "messages/" + mRoomId + "/" + mCurrentUserId;
+            String chat_user_ref = "messages/" + mRoomId + "/" + mChatUser;
 
-            DatabaseReference user_message_push = mRootRef.child("messages").child(mMatchId+"_"+mCurrentUserId).child(mMatchId+"_"+mChatUser).push();
+            DatabaseReference user_message_push = mRootRef.child("messages").child(mRoomId).child(mCurrentUserId).push();
+            if (user_message_push == null) {
+                Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+                return;
+            }
             String push_id = user_message_push.getKey();
 
-            Map messageMap = new HashMap();
+            Map<String, Object> messageMap = new HashMap<>();
             messageMap.put("message", message);
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserId);
 
-            Map messageUserMap = new HashMap();
+            Map<String, Object> messageUserMap = new HashMap<>();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
