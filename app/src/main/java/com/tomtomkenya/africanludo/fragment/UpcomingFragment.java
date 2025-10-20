@@ -28,16 +28,12 @@ import com.tomtomkenya.africanludo.activity.MainActivity;
 import com.tomtomkenya.africanludo.activity.MatchDetailActivity;
 import com.tomtomkenya.africanludo.adapter.UpcomingAdapter;
 import com.tomtomkenya.africanludo.api.ApiCalling;
-import com.tomtomkenya.africanludo.helper.AppConstant;
 import com.tomtomkenya.africanludo.helper.Function;
 import com.tomtomkenya.africanludo.helper.Preferences;
 import com.tomtomkenya.africanludo.helper.ProgressBar;
 import com.tomtomkenya.africanludo.model.MatchModel;
-import com.tomtomkenya.africanludo.model.MyResponse;
-import com.tomtomkenya.africanludo.model.Notification;
-import com.tomtomkenya.africanludo.model.Sender;
 import com.tomtomkenya.africanludo.model.UserModel;
-import com.tomtomkenya.africanludo.remote.APIService;
+import com.tomtomkenya.africanludo.services.PushTokenManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,8 +61,6 @@ public class UpcomingFragment extends Fragment {
     private DatabaseReference mUserRef;
 
     private int flag = 0;
-    private String token;
-    public APIService mService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -384,49 +378,30 @@ public class UpcomingFragment extends Fragment {
     }
 
     private void getUserToken(String id, String name) {
-        DatabaseReference mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        mUserRef.child(id).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                token = Objects.requireNonNull(dataSnapshot.child("device_token").getValue()).toString();
-
-                if (flag == 0) {
-                    flag = 1;
-                    sendNotification(name);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        if (flag == 0) {
+            flag = 1;
+            sendNotification(id, name);
+        }
     }
 
-    private void sendNotification(String name) {
-        mService = AppConstant.getFCMService();
+    private void sendNotification(String userId, String name) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("click_action", "MainActivity");
+        metadata.put("match_id", mMatchId);
+        api.sendGameplayPush(userId, "challenge_accepted",
+                "Challenge Accepted",
+                name + " has accepted your challenge. Update your room code to play.",
+                metadata).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                // Backend acknowledged the send request.
+            }
 
-        Map<String,String> map = new HashMap<>();
-        map.put("title","Challenge Accepted");
-        map.put("message",name + " has accepted your challenge. Update your room code to play.");
-        map.put("click_action","MainActivity");
-
-        //Create raw payload  to send
-        Notification notification = new Notification("Challenge Accepted",name + " has accepted your challenge. Update your room code to play.","MainActivity");
-        Sender content =  new Sender(token,notification);
-
-        mService.sendNotification(content)
-                .enqueue(new Callback<MyResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
-                        //Only run when get result
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<MyResponse> call, @NonNull Throwable t) {
-                        Log.e("ERROR", Objects.requireNonNull(t.getMessage()));
-                    }
-                });
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("ERROR", Objects.requireNonNull(t.getMessage()));
+            }
+        });
     }
 
     @Override
@@ -444,12 +419,13 @@ public class UpcomingFragment extends Fragment {
                 //Could not get FirebaseMessagingToken
                 return;
             }
-            if (null != task.getResult ()) {
-                //Got FirebaseMessagingToken
-                String device_token = Objects.requireNonNull ( task.getResult () );
-                //Use firebaseMessagingToken further
+                if (null != task.getResult ()) {
+                    //Got FirebaseMessagingToken
+                    String device_token = Objects.requireNonNull ( task.getResult () );
+                    new PushTokenManager(requireContext()).registerToken(device_token);
+                    //Use firebaseMessagingToken further
 
-                HashMap<String, String> userMap = new HashMap<>();
+                    HashMap<String, String> userMap = new HashMap<>();
                 userMap.put("name", Preferences.getInstance(getActivity()).getString(Preferences.KEY_FULL_NAME));
                 userMap.put("status", "Hi there I'm using "+getString(R.string.app_name)+" App.");
                 userMap.put("image", Preferences.getInstance(getActivity()).getString(Preferences.KEY_PROFILE_PHOTO));

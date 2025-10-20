@@ -26,6 +26,7 @@ import com.tomtomkenya.africanludo.api.ApiCalling;
 import com.tomtomkenya.africanludo.helper.AppConstant;
 import com.tomtomkenya.africanludo.helper.Function;
 import com.tomtomkenya.africanludo.helper.Preferences;
+import com.tomtomkenya.africanludo.services.PushTokenManager;
 import com.tomtomkenya.africanludo.helper.ProgressBar;
 import com.tomtomkenya.africanludo.model.UserModel;
 import com.goodiebag.pinview.Pinview;
@@ -53,6 +54,7 @@ public class OTPActivity extends AppCompatActivity {
     private TextView reEnterTv, timerTv;
 
     private String mobileSt, pageSt, deviceIdSt, tokenSt;
+    private PushTokenManager pushTokenManager;
     public int counter = 60;
 
     private ProgressBar progressBar;
@@ -74,6 +76,7 @@ public class OTPActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         api = MyApplication.getRetrofit().create(ApiCalling.class);
         progressBar = new ProgressBar(OTPActivity.this, false);
+        pushTokenManager = new PushTokenManager(this);
         deviceIdSt = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         changeStatusBarColor();
@@ -268,6 +271,7 @@ public class OTPActivity extends AppCompatActivity {
             if (null != task.getResult ()) {
                 //Got FirebaseMessagingToken
                 tokenSt = Objects.requireNonNull ( task.getResult () );
+                pushTokenManager.registerToken(tokenSt);
                 //Use firebaseMessagingToken further
                 Call<UserModel> call = api.customerRegistrationWithRefer(Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt, Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_REFER_CODE));
                 call.enqueue(new Callback<UserModel>() {
@@ -321,6 +325,7 @@ public class OTPActivity extends AppCompatActivity {
             if (null != task.getResult ()) {
                 //Got FirebaseMessagingToken
                 tokenSt = Objects.requireNonNull ( task.getResult () );
+                pushTokenManager.registerToken(tokenSt);
                 //Use firebaseMessagingToken further
                 Call<UserModel> call = api.customerRegistrationWithoutRefer(Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_FULL_NAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_USERNAME), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_EMAIL), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_COUNTRY_CODE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_MOBILE), Preferences.getInstance(OTPActivity.this).getString(Preferences.KEY_PASSWORD), tokenSt, deviceIdSt);
                 call.enqueue(new Callback<UserModel>() {

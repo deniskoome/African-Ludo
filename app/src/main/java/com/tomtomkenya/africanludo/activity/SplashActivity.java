@@ -26,6 +26,7 @@ import com.tomtomkenya.africanludo.api.ApiCalling;
 import com.tomtomkenya.africanludo.helper.AppConstant;
 import com.tomtomkenya.africanludo.helper.Function;
 import com.tomtomkenya.africanludo.helper.Preferences;
+import com.tomtomkenya.africanludo.services.PushTokenManager;
 import com.tomtomkenya.africanludo.model.AppModel;
 import com.tomtomkenya.africanludo.model.UserModel;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -89,19 +90,16 @@ public class SplashActivity extends AppCompatActivity {
         if (Function.checkNetworkConnection(SplashActivity.this)) {
             FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    // Get new FCM registration token
                     String token = task.getResult();
-
+                    new PushTokenManager(SplashActivity.this).registerToken(token);
                     Call<UserModel> callToken = api.updateUserProfileToken(Preferences.getInstance(SplashActivity.this).getString(Preferences.KEY_USER_ID), token);
                     callToken.enqueue(new Callback<UserModel>() {
                         @Override
                         public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
-
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<UserModel> call, @NonNull Throwable t) {
-
                         }
                     });
                 }

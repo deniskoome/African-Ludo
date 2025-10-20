@@ -23,6 +23,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.TextUtils;
 
 import com.tomtomkenya.africanludo.BuildConfig;
 import com.tomtomkenya.africanludo.MyApplication;
@@ -32,8 +33,13 @@ import com.tomtomkenya.africanludo.helper.AppConstant;
 import com.tomtomkenya.africanludo.helper.Function;
 import com.tomtomkenya.africanludo.helper.Preferences;
 import com.tomtomkenya.africanludo.helper.ProgressBar;
+import com.tomtomkenya.africanludo.model.PaymentGatewayModel;
+import com.tomtomkenya.africanludo.model.StripeIntentResponse;
 import com.tomtomkenya.africanludo.model.Token;
 import com.tomtomkenya.africanludo.model.UserModel;
+import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.paymentsheet.PaymentSheet;
+import com.stripe.android.paymentsheet.PaymentSheetResult;
 //import com.definiteautomation.dreamludo.payu.ServiceWrapper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.paytm.pgsdk.PaytmOrder;
@@ -48,15 +54,24 @@ import com.razorpay.PaymentResultListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
+import java.util.Locale;
+import java.util.Map;
 
 public class DepositActivity extends AppCompatActivity implements PaymentResultListener {
 
-    public RadioGroup radioGroup;
-    public RadioButton payTmRb, payuRb, flutterWaveRb;
+    private RadioGroup radioGroup;
+    private final Map<String, PaymentGatewayModel.Gateway> gatewayLookup = new HashMap<>();
+    private final Map<String, RadioButton> gatewayButtons = new HashMap<>();
+    private final List<PaymentGatewayModel.Gateway> activeGateways = new ArrayList<>();
+    private PaymentSheet paymentSheet;
+    private String stripeClientSecret;
+    private boolean stripeConfigured;
     private TextInputEditText amountEt;
     public TextView signTv, noteTv, alertTv;
     private Button submitBt;
@@ -82,6 +97,8 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         api = MyApplication.getRetrofit().create(ApiCalling.class);
         progressBar = new ProgressBar(this, false);
 
+        paymentSheet = new PaymentSheet(this, this::onStripePaymentSheetResult);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -92,9 +109,14 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         getUserDetails();
 
         radioGroup = findViewById(R.id.radioGroup);
-        payTmRb = findViewById(R.id.payTmRb);
-        payuRb = findViewById(R.id.payuRb);
-        flutterWaveRb = findViewById(R.id.flutterWaveRb);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            for (Map.Entry<String, RadioButton> entry : gatewayButtons.entrySet()) {
+                if (entry.getValue().getId() == checkedId) {
+                    onGatewaySelected(entry.getKey());
+                    break;
+                }
+            }
+        });
         amountEt = findViewById(R.id.amountEt);
         noteTv = findViewById(R.id.noteTv);
         alertTv = findViewById(R.id.alertTv);
@@ -104,79 +126,7 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
         signTv.setText(AppConstant.CURRENCY_SIGN);
         alertTv.setText(String.format("Minimum Add Amount is %s%d", AppConstant.CURRENCY_SIGN, AppConstant.MIN_DEPOSIT_LIMIT));
 
-        if (BuildConfig.ENABLE_PAYTM_SDK) {
-            payTmRb.setOnClickListener(v -> mopSt = "PayTm");
-        } else {
-            payTmRb.setOnClickListener(v -> Toast.makeText(this, R.string.paytm_disabled_message, Toast.LENGTH_SHORT).show());
-        }
-
-        //payuRb.setOnClickListener(v -> mopSt = "PayUMoney");
-
-        flutterWaveRb.setOnClickListener(v -> {
-            switch (AppConstant.MODE_OF_PAYMENT) {
-                case AppConstant.PAYMENT_GATEWAY_MPESA:
-                    mopSt = "Mpesa";
-                    break;
-                case AppConstant.PAYMENT_GATEWAY_MASTERCARD:
-                    mopSt = "Mastercard";
-                    break;
-                default:
-                    mopSt = "RazorPay";
-                    break;
-            }
-        });
-
-        switch (AppConstant.MODE_OF_PAYMENT) {
-            case AppConstant.PAYMENT_GATEWAY_PAYTM:
-                radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
-                payuRb.setVisibility(View.GONE);
-                flutterWaveRb.setVisibility(View.GONE);
-                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay";
-                break;
-            case AppConstant.PAYMENT_GATEWAY_PAYU:
-                radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(View.GONE);
-                payuRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setVisibility(View.GONE);
-                mopSt = "PayUMoney";
-                break;
-            case AppConstant.PAYMENT_GATEWAY_RAZORPAY:
-                radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(View.GONE);
-                payuRb.setVisibility(View.GONE);
-                flutterWaveRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setText(R.string.flutterwave);
-                mopSt = "RazorPay";
-                break;
-            case AppConstant.PAYMENT_GATEWAY_MPESA:
-                radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(View.GONE);
-                payuRb.setVisibility(View.GONE);
-                flutterWaveRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setText(R.string.mpesa);
-                mopSt = "Mpesa";
-                break;
-            case AppConstant.PAYMENT_GATEWAY_MASTERCARD:
-                radioGroup.setVisibility(View.GONE);
-                payTmRb.setVisibility(View.GONE);
-                payuRb.setVisibility(View.GONE);
-                flutterWaveRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setText(R.string.mastercard);
-                mopSt = "Mastercard";
-                break;
-            default:
-                radioGroup.setVisibility(View.VISIBLE);
-                payTmRb.setVisibility(BuildConfig.ENABLE_PAYTM_SDK ? View.VISIBLE : View.GONE);
-                payuRb.setVisibility(View.VISIBLE);
-                flutterWaveRb.setVisibility(View.VISIBLE);codex/add-payment-methods-in-depositactivity-d2jude
-                flutterWaveRb.setText(R.string.flutterwave);
-                mopSt = "PayTm";
-=======
-                mopSt = BuildConfig.ENABLE_PAYTM_SDK ? "PayTm" : "RazorPay"
-                break;
-        }
-
+        loadActiveGateways();
         submitBt.setOnClickListener(v -> {
             submitBt.setEnabled(false);
             try {
@@ -221,9 +171,6 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                                     Toast.makeText(DepositActivity.this, R.string.paytm_disabled_message, Toast.LENGTH_SHORT).show();
                                 }
                                 break;
-                            //case "PayUMoney":
-                            //    startPayUMoney();
-                            //    break;
                             case "RazorPay":
                                 startRazorPay();
                                 break;
@@ -232,6 +179,13 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
                                 break;
                             case "Mastercard":
                                 startMastercard();
+                                break;
+                            case "Stripe":
+                                startStripePayment();
+                                break;
+                            default:
+                                submitBt.setEnabled(true);
+                                Toast.makeText(DepositActivity.this, R.string.payment_option_not_supported, Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     } catch (NullPointerException e) {
@@ -248,17 +202,184 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
 
     }
 
+    private void loadActiveGateways() {
+        if (!Function.checkNetworkConnection(this)) {
+            applyLegacyGatewayFallback();
+            return;
+        }
+
+        Call<PaymentGatewayModel> call = api.getActiveGateways();
+        call.enqueue(new Callback<PaymentGatewayModel>() {
+            @Override
+            public void onResponse(@NonNull Call<PaymentGatewayModel> call, @NonNull Response<PaymentGatewayModel> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<PaymentGatewayModel.Gateway> depositGateways = new ArrayList<>();
+                    for (PaymentGatewayModel.Gateway gateway : response.body().getGateways()) {
+                        if (gateway != null && gateway.supportsAction("deposit") && isGatewaySupported(gateway)) {
+                            depositGateways.add(gateway);
+                        }
+                    }
+                    if (!depositGateways.isEmpty()) {
+                        configureGatewayButtons(depositGateways);
+                        return;
+                    }
+                }
+                applyLegacyGatewayFallback();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PaymentGatewayModel> call, @NonNull Throwable t) {
+                Log.e(TAG, "Failed to fetch gateway list", t);
+                applyLegacyGatewayFallback();
+            }
+        });
+    }
+
+    private void configureGatewayButtons(List<PaymentGatewayModel.Gateway> gateways) {
+        activeGateways.clear();
+        activeGateways.addAll(gateways);
+
+        List<String> gatewayNames = new ArrayList<>();
+        gatewayLookup.clear();
+        gatewayButtons.clear();
+        radioGroup.removeAllViews();
+
+        for (PaymentGatewayModel.Gateway gateway : gateways) {
+            String normalizedName = normalizeGatewayName(gateway.getName());
+            gatewayNames.add(normalizedName);
+            gatewayLookup.put(normalizedName, gateway);
+
+            RadioButton button = createGatewayButton(gateway, normalizedName);
+            gatewayButtons.put(normalizedName, button);
+            radioGroup.addView(button);
+        }
+
+        AppConstant.updateActiveGateways(gatewayNames);
+        radioGroup.setVisibility(View.VISIBLE);
+
+        if (!gatewayNames.isEmpty()) {
+            RadioButton first = gatewayButtons.get(gatewayNames.get(0));
+            if (first != null) {
+                first.setChecked(true);
+                onGatewaySelected(gatewayNames.get(0));
+            }
+        }
+    }
+
+    private RadioButton createGatewayButton(PaymentGatewayModel.Gateway gateway, String normalizedName) {
+        RadioButton button = new RadioButton(this);
+        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                RadioGroup.LayoutParams.WRAP_CONTENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT);
+        if (radioGroup.getOrientation() == RadioGroup.HORIZONTAL) {
+            params = new RadioGroup.LayoutParams(0, RadioGroup.LayoutParams.WRAP_CONTENT, 1f);
+        }
+        button.setLayoutParams(params);
+        button.setText(!TextUtils.isEmpty(gateway.getDisplayName()) ? gateway.getDisplayName() : normalizedName);
+        button.setId(View.generateViewId());
+        button.setOnClickListener(v -> onGatewaySelected(normalizedName));
+        return button;
+    }
+
+    private void onGatewaySelected(String gatewayName) {
+        mopSt = mapGatewayToMode(gatewayName);
+    }
+
+    private String normalizeGatewayName(String name) {
+        return name == null ? "" : name.trim().toLowerCase(Locale.US);
+    }
+
+    private String mapGatewayToMode(String gatewayName) {
+        switch (normalizeGatewayName(gatewayName)) {
+            case "paytm":
+                return "PayTm";
+            case "razorpay":
+                return "RazorPay";
+            case "mpesa":
+                return "Mpesa";
+            case "mastercard":
+                return "Mastercard";
+            case "stripe":
+                return "Stripe";
+            default:
+                return gatewayName;
+        }
+    }
+
+    private boolean isGatewaySupported(PaymentGatewayModel.Gateway gateway) {
+        String name = normalizeGatewayName(gateway != null ? gateway.getName() : null);
+        switch (name) {
+            case "paytm":
+                return BuildConfig.ENABLE_PAYTM_SDK;
+            case "razorpay":
+            case "mpesa":
+            case "mastercard":
+            case "stripe":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void applyLegacyGatewayFallback() {
+        List<PaymentGatewayModel.Gateway> fallback = new ArrayList<>();
+
+        switch (AppConstant.MODE_OF_PAYMENT) {
+            case AppConstant.PAYMENT_GATEWAY_PAYTM:
+                if (BuildConfig.ENABLE_PAYTM_SDK) {
+                    fallback.add(buildFallbackGateway("paytm", "PayTm"));
+                } else {
+                    fallback.add(buildFallbackGateway("razorpay", getString(R.string.flutterwave)));
+                }
+                break;
+            case AppConstant.PAYMENT_GATEWAY_RAZORPAY:
+                fallback.add(buildFallbackGateway("razorpay", getString(R.string.flutterwave)));
+                break;
+            case AppConstant.PAYMENT_GATEWAY_MPESA:
+                fallback.add(buildFallbackGateway("mpesa", getString(R.string.mpesa)));
+                break;
+            case AppConstant.PAYMENT_GATEWAY_MASTERCARD:
+                fallback.add(buildFallbackGateway("mastercard", getString(R.string.mastercard)));
+                break;
+            default:
+                if (BuildConfig.ENABLE_PAYTM_SDK) {
+                    fallback.add(buildFallbackGateway("paytm", "PayTm"));
+                }
+                fallback.add(buildFallbackGateway("razorpay", getString(R.string.flutterwave)));
+                break;
+        }
+
+        if (fallback.isEmpty()) {
+            fallback.add(buildFallbackGateway("razorpay", getString(R.string.flutterwave)));
+        }
+
+        configureGatewayButtons(fallback);
+    }
+
+    private PaymentGatewayModel.Gateway buildFallbackGateway(String name, String displayName) {
+        PaymentGatewayModel.Gateway gateway = new PaymentGatewayModel.Gateway();
+        gateway.setName(name);
+        gateway.setDisplayName(displayName);
+        List<String> actions = new ArrayList<>();
+        actions.add("deposit");
+        gateway.setSupportedActions(actions);
+        return gateway;
+    }
+
+
     private void getUserDetails() {
         Call<UserModel> call = api.getUserDetails(Preferences.getInstance(this).getString(Preferences.KEY_USER_ID));
         call.enqueue(new Callback<UserModel>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
+                submitBt.setEnabled(true);
+
                 if (response.isSuccessful()) {
                     UserModel legalData = response.body();
                     List<UserModel.Result> res;
                     if (legalData != null) {
                         res = legalData.getResult();
-                        if (res.get(0).getSuccess() == "1") {
+                        if ("1".equals(res.get(0).getSuccess())) {
                             if (res.get(0).getIs_block() == 1) {
                                 Preferences.getInstance(DepositActivity.this).setString(Preferences.KEY_IS_AUTO_LOGIN,"0");
 
@@ -310,6 +431,7 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
             @Override
             public void onFailure(@NonNull Call<UserModel> call, @NonNull Throwable t) {
                 progressBar.hideProgressDialog();
+                submitBt.setEnabled(true);
             }
         });
     }
@@ -576,6 +698,68 @@ public class DepositActivity extends AppCompatActivity implements PaymentResultL
             e.printStackTrace();
         }
     }
+
+    private void startStripePayment() {
+        if (!Function.checkNetworkConnection(this)) {
+            submitBt.setEnabled(true);
+            Function.showToast(this, getString(R.string.order_error));
+            return;
+        }
+
+        progressBar.showProgressDialog();
+        String currencyCode = TextUtils.isEmpty(AppConstant.CURRENCY_CODE) ? "USD" : AppConstant.CURRENCY_CODE;
+        Call<StripeIntentResponse> call = api.createStripeIntent(amountSt, currencyCode);
+        call.enqueue(new Callback<StripeIntentResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<StripeIntentResponse> call, @NonNull Response<StripeIntentResponse> response) {
+                progressBar.hideProgressDialog();
+                if (response.isSuccessful() && response.body() != null) {
+                    StripeIntentResponse payload = response.body();
+                    if (!TextUtils.isEmpty(payload.getClientSecret()) && !TextUtils.isEmpty(payload.getPublishableKey())) {
+                        stripeClientSecret = payload.getClientSecret();
+                        if (!stripeConfigured || !payload.getPublishableKey().equals(AppConstant.STRIPE_PUBLISHABLE_KEY)) {
+                            PaymentConfiguration.init(getApplicationContext(), payload.getPublishableKey());
+                            AppConstant.STRIPE_PUBLISHABLE_KEY = payload.getPublishableKey();
+                            stripeConfigured = true;
+                        }
+                        PaymentSheet.Configuration configuration = new PaymentSheet.Configuration.Builder(
+                                AppConstant.GAME_NAME != null ? AppConstant.GAME_NAME : getString(R.string.app_name)
+                        ).build();
+                        paymentSheet.presentWithPaymentIntent(stripeClientSecret, configuration);
+                        return;
+                    }
+                }
+                submitBt.setEnabled(true);
+                Function.showToast(DepositActivity.this, getString(R.string.payment_configuration_error));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StripeIntentResponse> call, @NonNull Throwable t) {
+                progressBar.hideProgressDialog();
+                submitBt.setEnabled(true);
+                Function.showToast(DepositActivity.this, t.getMessage() != null ? t.getMessage() : getString(R.string.order_error));
+            }
+        });
+    }
+
+    private void onStripePaymentSheetResult(PaymentSheetResult paymentSheetResult) {
+        if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
+            paymentIdSt = "STRIPE-" + UUID.randomUUID();
+            checksumSt = stripeClientSecret != null ? stripeClientSecret : "";
+            postDeposit();
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
+            submitBt.setEnabled(true);
+            Function.showToast(this, getString(R.string.order_cancel));
+        } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
+            submitBt.setEnabled(true);
+            PaymentSheetResult.Failed failed = (PaymentSheetResult.Failed) paymentSheetResult;
+            String message = failed.getError() != null ? failed.getError().getLocalizedMessage() : null;
+            Function.showToast(this, message != null ? message : getString(R.string.order_error));
+        } else {
+            submitBt.setEnabled(true);
+        }
+    }
+
 
     private boolean areCredentialsMissing(String... values) {
         for (String value : values) {

@@ -6,6 +6,11 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import java.util.List;
 
 public class NotificationUtils {
@@ -38,6 +43,20 @@ public class NotificationUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Utility invoked by the modern messaging service to map RemoteMessage data into a serializable Map.
+     */
+    public static Map<String, String> mapFromBundle(@NonNull Map<String, String> payload) {
+        return new HashMap<>(payload);
+    }
+
+    /**
+     * Simplified helper name for foreground playback when handling data messages.
+     */
+    public static void playInAppTone(@NonNull Context context) {
+        new NotificationUtils().playNotificationSound(context);
     }
 
 }

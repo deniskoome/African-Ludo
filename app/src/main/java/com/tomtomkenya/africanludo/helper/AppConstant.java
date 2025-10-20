@@ -3,6 +3,10 @@ package com.tomtomkenya.africanludo.helper;
 import com.tomtomkenya.africanludo.remote.APIService;
 import com.tomtomkenya.africanludo.remote.FCMRetrofitClient;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class AppConstant {
 
     // Put your api url
@@ -22,26 +26,36 @@ public class AppConstant {
     // Put your PayU production Merchant id & key
     public static String PAYU_M_ID = "XXXXXXXXXXXX";
     public static String PAYU_M_KEY = "XXXXXXXXXXX";
-codex/add-payment-methods-in-depositactivity-d2jude
+
     // Put your Mpesa production credentials
     public static String MPESA_CONSUMER_KEY = null;
     public static String MPESA_CONSUMER_SECRET = null;
-    public static String MPESA_PASSKEY = null;
-    public static String MPESA_SHORTCODE = null;
-    // Put your Mpesa production shortcode, passkey and callback URL
     public static String MPESA_SHORTCODE = null;
     public static String MPESA_PASSKEY = null;
-
     public static String MPESA_CALLBACK_URL = null;
 
     // Put your Mastercard production merchant id & key
     public static String MASTERCARD_MERCHANT_ID = null;
-codex/add-payment-methods-in-depositactivity-d2jude
     public static String MASTERCARD_API_KEY = null;
     public static String MASTERCARD_API_SECRET = null;
-
     public static String MASTERCARD_MERCHANT_KEY = null;
 
+    // Stripe configuration (publishable key used in the mobile app only)
+    public static String STRIPE_PUBLISHABLE_KEY = null;
+
+    // In-memory cache of active gateway identifiers used by the mobile client UI.
+    private static final List<String> ACTIVE_PAYMENT_GATEWAYS = new ArrayList<>();
+
+    public static void updateActiveGateways(List<String> gateways) {
+        ACTIVE_PAYMENT_GATEWAYS.clear();
+        if (gateways != null) {
+            ACTIVE_PAYMENT_GATEWAYS.addAll(gateways);
+        }
+    }
+
+    public static List<String> getActiveGateways() {
+        return Collections.unmodifiableList(ACTIVE_PAYMENT_GATEWAYS);
+    }
 
     // Set default country code, currency code and sign
     public static String COUNTRY_CODE = "+254";
@@ -56,7 +70,6 @@ codex/add-payment-methods-in-depositactivity-d2jude
     public static final int PAYMENT_GATEWAY_RAZORPAY = 2;
     public static final int PAYMENT_GATEWAY_MPESA = 3;
     public static final int PAYMENT_GATEWAY_MASTERCARD = 4;
-codex/add-payment-methods-in-depositactivity-d2jude
 
     public static int MODE_OF_PAYMENT = PAYMENT_GATEWAY_PAYTM;      // (0 for PayTm, 1 for PayU, 2 for RazorPay, 3 for Mpesa, 4 for Mastercard)
 
@@ -95,6 +108,8 @@ codex/add-payment-methods-in-depositactivity-d2jude
     // FCM URL
     private static final String FCM_URL = "https://fcm.googleapis.com/";
 
+    // Deprecated: retained only so older builds can still fallback to the legacy FCM sender while
+    // the new backend rollout completes.
     public static APIService getFCMService() {
         return FCMRetrofitClient.getClient(FCM_URL).create(APIService.class);
     }
