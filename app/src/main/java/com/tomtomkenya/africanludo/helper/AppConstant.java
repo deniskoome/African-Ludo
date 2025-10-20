@@ -95,6 +95,8 @@ codex/add-payment-methods-in-depositactivity-d2jude
     // FCM URL
     private static final String FCM_URL = "https://fcm.googleapis.com/";
 
+    // Deprecated: retained only so older builds can still fallback to the legacy FCM sender while
+    // the new backend rollout completes.
     public static APIService getFCMService() {
         return FCMRetrofitClient.getClient(FCM_URL).create(APIService.class);
     }

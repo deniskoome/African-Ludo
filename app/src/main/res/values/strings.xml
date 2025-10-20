@@ -47,4 +47,6 @@
     <string name="payment_configuration_error">Payment configuration is incomplete. Please contact support.</string>
 
     <string name="paytm_disabled_message">Paytm support is disabled in this build.</string>
+    <string name="notification_channel_gameplay">Gameplay alerts</string>
+    <string name="notification_channel_gameplay_description">Real-time match updates and wallet alerts.</string>
 </resources>

@@ -28,14 +28,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.tomtomkenya.africanludo.R;
+import com.tomtomkenya.africanludo.MyApplication;
+import com.tomtomkenya.africanludo.api.ApiCalling;
 import com.tomtomkenya.africanludo.adapter.MessageAdapter;
 import com.tomtomkenya.africanludo.helper.AppConstant;
 import com.tomtomkenya.africanludo.helper.Preferences;
 import com.tomtomkenya.africanludo.model.Messages;
-import com.tomtomkenya.africanludo.model.MyResponse;
-import com.tomtomkenya.africanludo.model.Notification;
-import com.tomtomkenya.africanludo.model.Sender;
-import com.tomtomkenya.africanludo.remote.APIService;
 import com.tomtomkenya.africanludo.utils.GetTimeAgo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -91,7 +89,7 @@ public class ChatActivity extends AppCompatActivity {
     private String mLastKey = "";
     private String mPrevKey = "";
 
-    public APIService mService;
+    private ApiCalling api;
     private String token, online;
 
     @SuppressLint("SetTextI18n")
@@ -110,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
         mCurrentUserId = Preferences.getInstance(this).getString(Preferences.KEY_USER_ID);
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUserId);
+        api = MyApplication.getRetrofit().create(ApiCalling.class);
 
         mChatUser = getIntent().getStringExtra("user_id");
         String userName = getIntent().getStringExtra("user_name");
@@ -467,25 +466,17 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendNotification(String name, String message) {
-        mService = AppConstant.getFCMService();
-
-        Map<String,String> map = new HashMap<>();
-        map.put("title",name);
-        map.put("message",message);
-        map.put("click_action","MainActivity");
-
-        //Create raw payload  to send
-        Notification notification = new Notification(name,message,"MainActivity");
-        Sender content =  new Sender(token,notification);
-
-        mService.sendNotification(content).enqueue(new Callback<MyResponse>() {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("click_action", "MainActivity");
+        metadata.put("match_id", mMatchId);
+        api.sendGameplayPush(mChatUser, "chat_message", name, message, metadata).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
-
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                // Acknowledgement not required; UI already updated locally.
             }
 
             @Override
-            public void onFailure(@NonNull Call<MyResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e("ERROR", Objects.requireNonNull(t.getMessage()));
             }
         });

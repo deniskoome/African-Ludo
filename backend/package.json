@@ -1,0 +1,24 @@
+{
+  "name": "african-ludo-backend",
+  "version": "1.0.0",
+  "description": "Backend services for African Ludo push notifications",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand"
+  },
+  "dependencies": {
+    "axios": "1.7.7",
+    "body-parser": "1.20.3",
+    "express": "4.19.2",
+    "google-auth-library": "9.15.0",
+    "multer": "1.4.5-lts.1",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "nock": "13.4.0",
+    "supertest": "6.3.4"
+  }
+}
