@@ -40,4 +40,5 @@ public class ApiConstant {
     public static final String GET_ABOUT_US = "api/get_about_us";
     public static final String GET_FAQ = "api/get_faq";
     public static final String GET_RULES = "api/get_rules";
+    public static final String GET_ACTIVE_GATEWAYS = "gateways/active";
 }

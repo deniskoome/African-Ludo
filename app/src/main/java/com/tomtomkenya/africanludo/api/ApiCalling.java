@@ -1,12 +1,14 @@
 package com.tomtomkenya.africanludo.api;
 
 import com.tomtomkenya.africanludo.model.AppModel;
+import com.tomtomkenya.africanludo.model.PaymentGatewayModel;
 import com.tomtomkenya.africanludo.model.ConfigurationModel;
 import com.tomtomkenya.africanludo.model.HistoryModel;
 import com.tomtomkenya.africanludo.model.LeaderboardModel;
 import com.tomtomkenya.africanludo.model.MatchModel;
 import com.tomtomkenya.africanludo.model.NotificationModel;
 import com.tomtomkenya.africanludo.model.StatisticsModel;
+import com.tomtomkenya.africanludo.model.StripeIntentResponse;
 import com.tomtomkenya.africanludo.model.Token;
 import com.tomtomkenya.africanludo.model.UserModel;
 
@@ -73,6 +75,10 @@ public interface ApiCalling {
     @Headers("Cache-Control: no-cache")
     @GET(ApiConstant.GET_APP_DETAILS)
     Call<AppModel> getAppDetails();
+
+    @Headers("Cache-Control: no-cache")
+    @GET(ApiConstant.GET_ACTIVE_GATEWAYS)
+    Call<PaymentGatewayModel> getActiveGateways();
 
 
 
@@ -163,6 +169,13 @@ public interface ApiCalling {
             @Field("checksum") String checksum,
             @Field("amount") double amount,
             @Field("payment_getway") String payment_getway);
+
+    @FormUrlEncoded
+    @POST("payments/stripe/intent")
+    Call<StripeIntentResponse> createStripeIntent(
+            @Field("amount") String amount,
+            @Field("currency") String currency
+    );
 
     @FormUrlEncoded
     @POST(ApiConstant.POST_WITHDRAW)

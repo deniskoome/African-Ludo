@@ -96,6 +96,9 @@ dependencies {
     implementation 'com.mastercard.gateway:gateway-android:1.7.3'
     implementation 'com.mastercard.gateway:gateway-android-web:1.7.3'
 
+    // Stripe PaymentSheet -------------------------------------------------------
+    implementation 'com.stripe:stripe-android:20.44.1'
+
     // PayTm All-In-One SDK (optional legacy support) ----------------------------
     if (enablePaytmSdk) {
         implementation 'com.paytm.appinvokesdk:appinvokesdk:1.6.17'
